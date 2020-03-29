@@ -46,7 +46,7 @@ def compute_coherence_values(dictionary, corpus_gensim, corpus_tokenized, num_to
                                                 random_state=100, update_every=1, chunksize=100, passes=10, 
                                                 alpha='auto', per_word_topics=True)
         model_list.append(model)
-        coherencemodel = CoherenceModel(model=model, texts=texts, dictionary=dictionary, coherence='c_v')
+        coherencemodel = CoherenceModel(model=model, texts=corpus_tokenized, dictionary=dictionary, coherence='c_v')
         coherence_values.append(coherencemodel.get_coherence())
         if num_topics%1 == 0:
             print(num_topics)
