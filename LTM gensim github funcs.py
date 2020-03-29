@@ -37,17 +37,17 @@ def textClean(corpus_raw):
     return normalized
 
 ## routine 2 - gridsearch on coherence vals
-def compute_coherence_values(dictionary, corpus_gensim, corpus_tokenized, num_topics1):   
+def compute_coherence_values1(dictionary, corpus, texts, num_topics_list):
     coherence_values = []
     model_list = []
-    for num_topics0 in num_topics1:
-        model = gensim.models.ldamodel.LdaModel(corpus_gensim, id2word, num_topics=num_topics0, 
-                                                random_state=100, update_every=1, chunksize=100, passes=10, 
-                                                alpha='auto', per_word_topics=True)
+    #num_topics1 = [i for i in range(start, limit, step)]
+    for num_topics in num_topics_list:
+        model = gensim.models.ldamodel.LdaModel(corpus=corpus, id2word=id2word, num_topics=num_topics, random_state=100,
+                                           update_every=1, chunksize=100, passes=10, alpha='auto', per_word_topics=True)
         model_list.append(model)
-        coherencemodel = CoherenceModel(model, corpus_tokenized, dictionary, coherence='c_v')
+        coherencemodel = CoherenceModel(model=model, texts=texts, dictionary=dictionary, coherence='c_v')
         coherence_values.append(coherencemodel.get_coherence())
-     
+
     return model_list, coherence_values  # note, list of 2 objs returned
 
 ## routine 2a - plot coherence metrics. input is outp of prev func
