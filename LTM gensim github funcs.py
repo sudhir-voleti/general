@@ -42,11 +42,11 @@ def compute_coherence_values(dictionary, corpus_gensim, corpus_tokenized, num_to
     model_list = []
     # num_topics1 = [i for i in range(start, limit, step)]
     for num_topics in num_topics1:
-        model = gensim.models.ldamodel.LdaModel(corpus=corpus_gensim, id2word=id2word, num_topics=num_topics, 
+        model = gensim.models.ldamodel.LdaModel(corpus_gensim, id2word, num_topics=num_topics, 
                                                 random_state=100, update_every=1, chunksize=100, passes=10, 
                                                 alpha='auto', per_word_topics=True)
         model_list.append(model)
-        coherencemodel = CoherenceModel(model=model, texts=corpus_tokenized, dictionary=dictionary, coherence='c_v')
+        coherencemodel = CoherenceModel(model, corpus_tokenized, dictionary, coherence='c_v')
         coherence_values.append(coherencemodel.get_coherence())
         if num_topics%1 == 0:
             print(num_topics)
