@@ -40,8 +40,8 @@ def textClean(corpus_raw):
 def compute_coherence_values(dictionary, corpus_gensim, corpus_tokenized, num_topics1):   
     coherence_values = []
     model_list = []
-    for num_topics in num_topics1:
-        model = gensim.models.ldamodel.LdaModel(corpus_gensim, id2word, num_topics=num_topics, 
+    for num_topics0 in num_topics1:
+        model = gensim.models.ldamodel.LdaModel(corpus_gensim, id2word, num_topics=num_topics0, 
                                                 random_state=100, update_every=1, chunksize=100, passes=10, 
                                                 alpha='auto', per_word_topics=True)
         model_list.append(model)
