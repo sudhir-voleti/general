@@ -66,18 +66,14 @@ def plot_coherence(coherence_values, num_topics_list):
 	plt.show()
 
 ## routine 3 - gridsearch via perplexity scores
-def compute_coherence_values1(dictionary, corpus, texts, num_topics_list):
-    coherence_values = []
-    model_list = []
-    #num_topics1 = [i for i in range(start, limit, step)]
-    for num_topics in num_topics_list:
-        model = gensim.models.ldamodel.LdaModel(corpus=corpus, id2word=id2word, num_topics=num_topics, random_state=100,
-                                           update_every=1, chunksize=100, passes=10, alpha='auto', per_word_topics=True)
-        model_list.append(model)
-        coherencemodel = CoherenceModel(model=model, texts=texts, dictionary=dictionary, coherence='c_v')
-        coherence_values.append(coherencemodel.get_coherence()); print(num_topics)
-
-    return model_list, coherence_values  # note, list of 2 objs returned
+def compute_perplexity_values(model_list, corpus, num_topics_list):
+    perplexity_values = []
+    for num_topics in range(start, limit, step):
+        model_index = num_topics - start
+        model = model_list[model_index]
+        perplexity_values.append(model.log_perplexity(corpus))
+        
+    return perplexity_values  # note, list of 1 obj only returned
 
 ## routine 3a - plot perplexity metrics
 def plot_perplexity(perplexity_values, num_topics_list):
