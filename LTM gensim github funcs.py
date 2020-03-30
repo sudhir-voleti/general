@@ -46,8 +46,7 @@ def compute_coherence_values1(dictionary, corpus, texts, num_topics_list):
                                            update_every=1, chunksize=100, passes=10, alpha='auto', per_word_topics=True)
         model_list.append(model)
         coherencemodel = CoherenceModel(model=model, texts=texts, dictionary=dictionary, coherence='c_v')
-        coherence_values.append(coherencemodel.get_coherence())
-	print(num_topics)
+        coherence_values.append(coherencemodel.get_coherence()); print(num_topics)
 
     return model_list, coherence_values  # note, list of 2 objs returned
 
