@@ -66,14 +66,18 @@ def plot_coherence(coherence_values, num_topics_list):
 	plt.show()
 
 ## routine 3 - gridsearch via perplexity scores
-def compute_perplexity_values(model_list, corpus, num_topics_list):  # start, limit, step
-    perplexity_values = []
+def compute_coherence_values1(dictionary, corpus, texts, num_topics_list):
+    coherence_values = []
+    model_list = []
+    #num_topics1 = [i for i in range(start, limit, step)]
     for num_topics in num_topics_list:
-        model_index = num_topics - num_topics_list[0]
-        model = model_list[model_index]
-        perplexity_values.append(model.log_perplexity(corpus))
-        
-    return perplexity_values  # note, list of 1 obj only returned
+        model = gensim.models.ldamodel.LdaModel(corpus=corpus, id2word=id2word, num_topics=num_topics, random_state=100,
+                                           update_every=1, chunksize=100, passes=10, alpha='auto', per_word_topics=True)
+        model_list.append(model)
+        coherencemodel = CoherenceModel(model=model, texts=texts, dictionary=dictionary, coherence='c_v')
+        coherence_values.append(coherencemodel.get_coherence()); print(num_topics)
+
+    return model_list, coherence_values  # note, list of 2 objs returned
 
 ## routine 3a - plot perplexity metrics
 def plot_perplexity(perplexity_values, num_topics_list):
@@ -175,4 +179,43 @@ def ltm_outp_df(model_list, num_topics_list, id2word, K):
 
     return(beta_df, gamma_df, sent_topics_df)
 
+## Routine 8 - wrapper over all above funcs
+def ltm_wrapper(corpus_raw, num_topics_list):  # start1, limit1, step1
     
+    corpus_cleaned, corpus_tokenized, id2word, corpus_gensim = build_gensim_corpus(corpus_raw) 
+    print("build_gensim_corpus done.\n")
+    # num_topics_list = [x for x in range(start1, limit1, step1)]; num_topics_list
+    
+    model_list, coherence_values = compute_coherence_values1(id2word, corpus_gensim, corpus_tokenized, num_topics_list)    
+       
+    perplexity_values = compute_perplexity_values(model_list, corpus_gensim, num_topics_list)
+    
+    print("grid searches done.\n")
+    
+    # print gridSearch results
+    coher = [(coherence_values[i0], num_topics_list[i0]) for i0 in range(len(num_topics_list))]
+    perpl = [(perplexity_values[i0], num_topics_list[i0]) for i0 in range(len(num_topics_list))]
+    opt_num_topics_coher = [y for (x,y) in coher if x == max(coherence_values)]; opt_num_topics_coher[0]
+    opt_num_topics_perpl = [y for (x,y) in perpl if x == min(perplexity_values)]; opt_num_topics_perpl[0]
+	
+    # display plots		
+    plot_coherence(coherence_values, num_topics_list)
+    plot_coherence(coherence_values, num_topics_list)
+		
+    print("opt_num_topics_coher: ", opt_num_topics_coher[0])
+    print("opt_num_topics_perpl: ", opt_num_topics_perpl[0])
+    
+    K = opt_num_topics_coher[0]; print("optimal num_topix: ", K,"\n")  # default
+    
+    K1 = K  - num_topics_list[0]; print("K1: ", K1, "\n")   # account for starting point offset
+    optimal_model = model_list[K1]
+    
+    beta_df = build_beta_df(optimal_model, id2word)  # 0.004 secs
+    beta_df = beta_df.T; beta_df.shape
+    
+    gamma_df = build_gamma_df(optimal_model, corpus_cleaned); gamma_df.shape 
+    sent_topics_df = domi_topic_df(gamma_df)  
+    print("factor matrices done.\n")
+    
+    return(beta_df, gamma_df, sent_topics_df)
+
