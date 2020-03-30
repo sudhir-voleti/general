@@ -68,7 +68,7 @@ def plot_coherence(coherence_values, num_topics_list):
 ## routine 3 - gridsearch via perplexity scores
 def compute_perplexity_values(model_list, corpus, num_topics_list):
     perplexity_values = []
-    for num_topics in range(start, limit, step):
+    for num_topics in num_topics_list:
         model_index = num_topics - start
         model = model_list[model_index]
         perplexity_values.append(model.log_perplexity(corpus))
