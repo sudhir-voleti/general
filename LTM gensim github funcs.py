@@ -104,7 +104,7 @@ def build_beta_df(lda_model, id2word):  # lda_model is the optimal_model here
     return(beta_df)
 
 ## routine 4a - get gamma matrix
-def build_gamma_df(lda_model, corpus_raw):  # lda_model is the optimal_model here
+def build_gamma_df(lda_model, corpus_raw, id2word):  # lda_model is the optimal_model here
     gamma_doc = []  # empty list 2 populate with gamma colms
     num_topics = lda_model.get_topics().shape[0]
     
@@ -195,7 +195,7 @@ def ltm_wrapper(corpus_raw, num_topics_list):  # start1, limit1, step1
 	
     # display plots		
     plot_coherence(coherence_values, num_topics_list)
-    plot_coherence(coherence_values, num_topics_list)
+    plot_perplexity(perplexity_values, num_topics_list)
 		
     print("opt_num_topics_coher: ", opt_num_topics_coher[0])
     print("opt_num_topics_perpl: ", opt_num_topics_perpl[0])
@@ -208,7 +208,7 @@ def ltm_wrapper(corpus_raw, num_topics_list):  # start1, limit1, step1
     beta_df = build_beta_df(optimal_model, id2word)  # 0.004 secs
     beta_df = beta_df.T; beta_df.shape
     
-    gamma_df = build_gamma_df(optimal_model, corpus_cleaned); gamma_df.shape 
+    gamma_df = build_gamma_df(optimal_model, corpus_cleaned, id2word); gamma_df.shape 
     sent_topics_df = domi_topic_df(gamma_df)  
     print("factor matrices done.\n")
     
