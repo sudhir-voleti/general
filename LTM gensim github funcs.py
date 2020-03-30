@@ -47,6 +47,7 @@ def compute_coherence_values1(dictionary, corpus, texts, num_topics_list):
         model_list.append(model)
         coherencemodel = CoherenceModel(model=model, texts=texts, dictionary=dictionary, coherence='c_v')
         coherence_values.append(coherencemodel.get_coherence())
+	print(num_topics)
 
     return model_list, coherence_values  # note, list of 2 objs returned
 
@@ -69,10 +70,10 @@ def plot_coherence(coherence_values, num_topics_list):
 def compute_perplexity_values(model_list, corpus, num_topics_list):
     perplexity_values = []
     for num_topics in num_topics_list:
-        model_index = num_topics - start
+        model_index = num_topics - num_topics_list[0]
         model = model_list[model_index]
         perplexity_values.append(model.log_perplexity(corpus))
-	print(num_topics)
+	# print(num_topics)
         
     return perplexity_values  # note, list of 1 obj only returned
 
