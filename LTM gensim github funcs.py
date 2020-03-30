@@ -37,7 +37,7 @@ def textClean(corpus_raw):
     return normalized
 
 ## routine 2 - gridsearch on coherence vals
-def compute_coherence_values1(dictionary, corpus, texts, num_topics_list):
+def compute_coherence_values1(dictionary, corpus, texts, id2word, num_topics_list):
     coherence_values = []
     model_list = []
     #num_topics1 = [i for i in range(start, limit, step)]
