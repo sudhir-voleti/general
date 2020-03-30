@@ -72,6 +72,7 @@ def compute_perplexity_values(model_list, corpus, num_topics_list):
         model_index = num_topics - start
         model = model_list[model_index]
         perplexity_values.append(model.log_perplexity(corpus))
+	print(num_topics)
         
     return perplexity_values  # note, list of 1 obj only returned
 
