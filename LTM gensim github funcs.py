@@ -45,7 +45,7 @@ def compute_coherence_values1(dictionary, corpus, texts, num_topics_list):
                                            update_every=1, chunksize=100, passes=10, alpha='auto', per_word_topics=True)
         model_list.append(model)
         coherencemodel = CoherenceModel(model=model, texts=texts, dictionary=dictionary, coherence='c_v')
-        coherence_values.append(coherencemodel.get_coherence()) # print(num_topics)
+        coherence_values.append(coherencemodel.get_coherence()); print(num_topics)
 	
     return model_list, coherence_values   
 
@@ -128,7 +128,7 @@ def build_gamma_df(lda_model, corpus_raw, id2word):  # lda_model is the optimal_
     return(gamma_df)    
 
 ## routine 5 - get dominant Topic DF
-def domi_topic_df(gamma_df):
+def domi_topic_df(gamma_df, optimal_model):
 	row0 = gamma_df.values.tolist()
 	row=[]
 	for i in range(len(row0)):
@@ -209,7 +209,7 @@ def ltm_wrapper(corpus_raw, num_topics_list):  # start1, limit1, step1
     beta_df = beta_df.T; beta_df.shape
     
     gamma_df = build_gamma_df(optimal_model, corpus_cleaned, id2word); gamma_df.shape 
-    sent_topics_df = domi_topic_df(gamma_df)  
+    sent_topics_df = domi_topic_df(gamma_df, optimal_model)  
     print("factor matrices done.\n")
     
     return(beta_df, gamma_df, sent_topics_df)
