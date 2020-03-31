@@ -206,6 +206,8 @@ def ltm_wrapper(corpus_raw, num_topics_list):  # start1, limit1, step1
     
     beta_df = build_beta_df(optimal_model, id2word)  # 0.004 secs
     beta_df = beta_df.T; beta_df.shape
+    tokens = list(beta_df.index)
+    beta_df.insert(0, "tokens", tokens)  # insert tokens as a colm	
     
     gamma_df = build_gamma_df(optimal_model, corpus_cleaned, id2word); gamma_df.shape 
     sent_topics_df = domi_topic_df(gamma_df, optimal_model)  
