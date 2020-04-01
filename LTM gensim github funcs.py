@@ -200,8 +200,8 @@ def ltm_wrapper(corpus_raw, num_topics_list):  # start1, limit1, step1
     print("opt_num_topics_perpl: ", opt_num_topics_perpl[0])
     
     K = opt_num_topics_coher[0]; print("optimal num_topix: ", K,"\n")  # default
-    
-    K1 = K  - num_topics_list[0]; print("K1: ", K1, "\n")   # account for starting point offset
+    K10 = [x for x in range(len(num_topics_list)) if num_topics_list[x] == opt_num_topics_coher[0]]
+    K1 = K10[0]; print("K1: ", K1, "\n")   # account for starting point offset
     optimal_model = model_list[K1]
     
     beta_df = build_beta_df(optimal_model, id2word)  # 0.004 secs
@@ -213,5 +213,5 @@ def ltm_wrapper(corpus_raw, num_topics_list):  # start1, limit1, step1
     sent_topics_df = domi_topic_df(gamma_df, optimal_model)  
     print("factor matrices done.\n")
     
-    return(beta_df, gamma_df, sent_topics_df)
+    return(beta_df, gamma_df, sent_topics_df, optimal_model)
 
