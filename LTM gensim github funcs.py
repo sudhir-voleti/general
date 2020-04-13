@@ -215,3 +215,27 @@ def ltm_wrapper(corpus_raw, num_topics_list):  # start1, limit1, step1
     
     return(beta_df, gamma_df, sent_topics_df, optimal_model)
 
+
+## Routine 9 - Build and display wordclouds
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+
+def make_wordcloud(beta_sub_df):  # only 2 colms - tokens and topic
+	mean0 = beta_sub_df.iloc[:,1].mean(); mean0
+	series0 = round(beta_sub_df.iloc[:,1]/mean0, 0); series0[:8]
+	beta_sub_df.iloc[:,1] = series0
+
+	# build dict as wordcl input
+	d = {}
+	for a, x in beta_sub_df.values:
+		d[a] = x
+
+	# invoke wordcloud
+	wordcloud = WordCloud()
+	wordcloud.generate_from_frequencies(frequencies=d)
+	plt.figure(figsize=(20,10))
+	plt.imshow(wordcloud, interpolation="bilinear")
+	plt.axis("off")
+	title0 = beta_sub_df.columns[1]
+	plt.title(title0)
+	plt.show()
