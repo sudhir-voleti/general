@@ -241,7 +241,7 @@ def make_wordcloud(beta_sub_df):  # only 2 colms - tokens and topic
 	plt.show()
 	
 ## Routine 10 - build DTMs for COGs later in R
-def list2dtm(text_list):  # intermed routine
+def list2dtm(text_list, cutoff=0.025):  # bottom 2.5% tokens by TF dropped. intermed routine.
     
     text = text_list
     vectorizer = CountVectorizer(lowercase=False)  # from sklearn.feature_extraction.text import CountVectorizer
@@ -259,7 +259,13 @@ def list2dtm(text_list):  # intermed routine
     # sort DTM colms in descending order
     a1_index = np.argsort(-a1)  # desc sort of a1 & index return
     test = dtm.iloc[:, a1_index]
-    return(test)
+
+    # impose cutoff on #colms    
+    colmsums = test.sum(axis=0)  # note: axis=0 gives colmsum, not 1
+    colmsum_logi = (colmsums > cutoff*len(text_list))  # incidence in > 2.5% of docs
+    colmsum_logi.sum()  # 1868
+    dtm1 = dtm.loc[:, colmsum_logi.to_list()]	
+    return(dtm1)
 
 def series2dtm(corpus_raw):  # wrapper over intermed routine abv
 	corpus_cleaned = textClean(corpus_raw)
