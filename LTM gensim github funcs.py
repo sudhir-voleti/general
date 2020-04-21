@@ -239,3 +239,35 @@ def make_wordcloud(beta_sub_df):  # only 2 colms - tokens and topic
 	title0 = beta_sub_df.columns[1]
 	plt.title(title0)
 	plt.show()
+	
+## Routine 10 - build DTMs for COGs later in R
+def list2dtm(text_list):  # intermed routine
+    
+    text = text_list
+    vectorizer = CountVectorizer(lowercase=False)  # from sklearn.feature_extraction.text import CountVectorizer
+    # vectorizer.fit(text)  # tokenize and build vocab
+    vector = vectorizer.fit_transform(text)  # encode document
+    
+    # build DTM outp as DF
+    a0 = vector.toarray()   # dense matrix form
+    a1 = np.sum(a0, axis = 0)  # vec obj of colm sums
+    a2 = vectorizer.vocabulary_  # dict obj
+    a3 = {k: v for k, v in sorted(a2.items(), key=lambda item: item[1])}  # sort keys by value
+    a4 = [k for (k, v) in a3.items()]  # list of tokens
+    dtm = pd.DataFrame(data = a0, columns = a4)
+    
+    # sort DTM colms in descending order
+    a1_index = np.argsort(-a1)  # desc sort of a1 & index return
+    test = dtm.iloc[:, a1_index]
+    return(test)
+
+def series2dtm(corpus_raw):  # wrapper over intermed routine abv
+	corpus_cleaned = textClean(corpus_raw)
+	sents_str = []
+	for i0 in range(len(corpus_cleaned)):
+		a0 = str(corpus_cleaned[i0]).strip('[]'); a0
+		a1 = re.sub(r"\'","",a0); a1
+		sents_str.append(str(a1)); sents_str
+
+	dtm = list2dtm(sents_str)
+	return(dtm)
