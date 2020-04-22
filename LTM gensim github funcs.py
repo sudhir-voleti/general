@@ -23,6 +23,9 @@ from nltk.corpus import stopwords
 import string  # for the .join() func
 import matplotlib.pyplot as plt
 
+# for dtm processing
+from sklearn.feature_extraction.text import CountVectorizer
+
 lemma = WordNetLemmatizer()
 stop_words = stopwords.words('english')
 
