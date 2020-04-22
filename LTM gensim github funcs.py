@@ -267,7 +267,7 @@ def list2dtm(text_list, cutoff=0.025):  # bottom 2.5% tokens by TF dropped. inte
     dtm1 = dtm.loc[:, colmsum_logi.to_list()]	
     return(dtm1)
 
-def series2dtm(corpus_raw):  # wrapper over intermed routine abv
+def series2dtm(corpus_raw, cutoff=0.025):  # wrapper over intermed routine abv
 	corpus_cleaned = textClean(corpus_raw)
 	sents_str = []
 	for i0 in range(len(corpus_cleaned)):
@@ -275,5 +275,5 @@ def series2dtm(corpus_raw):  # wrapper over intermed routine abv
 		a1 = re.sub(r"\'","",a0); a1
 		sents_str.append(str(a1)); sents_str
 
-	dtm = list2dtm(sents_str)
+	dtm = list2dtm(sents_str, cutoff)
 	return(dtm)
