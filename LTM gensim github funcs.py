@@ -244,10 +244,10 @@ def make_wordcloud(beta_sub_df):  # only 2 colms - tokens and topic
 	plt.show()
 	
 ## Routine 10 - build DTMs for COGs later in R
-def list2dtm(text_list, cutoff=0.025):  # bottom 2.5% tokens by TF dropped. intermed routine.
+def list2dtm(text_list, max_thresh, min_thresh):  # bottom 2.5% tokens by TF dropped. intermed routine.
     
     text = text_list
-    vectorizer = CountVectorizer(lowercase=False)  # from sklearn.feature_extraction.text import CountVectorizer
+    vectorizer = CountVectorizer(lowercase=False, max_df=max_thresh, min_df=min_thresh)  # from sklearn.feature_extraction.text import CountVectorizer
     # vectorizer.fit(text)  # tokenize and build vocab
     vector = vectorizer.fit_transform(text)  # encode document
     
@@ -258,19 +258,10 @@ def list2dtm(text_list, cutoff=0.025):  # bottom 2.5% tokens by TF dropped. inte
     a3 = {k: v for k, v in sorted(a2.items(), key=lambda item: item[1])}  # sort keys by value
     a4 = [k for (k, v) in a3.items()]  # list of tokens
     dtm = pd.DataFrame(data = a0, columns = a4)
-    
-    # sort DTM colms in descending order
-    a1_index = np.argsort(-a1)  # desc sort of a1 & index return
-    test = dtm.iloc[:, a1_index]
+    return(dtm)
 
-    # impose cutoff on #colms    
-    colmsums = test.sum(axis=0)  # note: axis=0 gives colmsum, not 1
-    colmsum_logi = (colmsums > cutoff*len(text_list))  # incidence in > 2.5% of docs
-    colmsum_logi.sum()  # 1868
-    dtm1 = dtm.loc[:, colmsum_logi.to_list()]	
-    return(dtm1)
-
-def series2dtm(corpus_raw, cutoff=0.025):  # wrapper over intermed routine abv
+# wrapper over intermed routine abv
+def series2dtm(corpus_raw, max_thresh, min_thresh):  
 	corpus_cleaned = textClean(corpus_raw)
 	sents_str = []
 	for i0 in range(len(corpus_cleaned)):
@@ -278,5 +269,37 @@ def series2dtm(corpus_raw, cutoff=0.025):  # wrapper over intermed routine abv
 		a1 = re.sub(r"\'","",a0); a1
 		sents_str.append(str(a1)); sents_str
 
-	dtm = list2dtm(sents_str, cutoff)
+	dtm = list2dtm(sents_str, max_thresh, min_thresh)
 	return(dtm)
+
+# Routine 11: to get DTM & beta_df for COG & Wordcl
+def get_dtm_beta(dtm_select, beta_df):
+
+	## reshape beta_df & dtm into colms found in one another
+	a0 = dtm_select.columns; a0[:8]
+	a00 = beta_df['tokens'].to_list(); a00[:8]
+
+	a1 = [bool(x in a0) for x in a00]; a1[:8]
+	# a1.count(True)  # 1119
+	beta_df_select = beta_df.loc[a1,:]; beta_df_select.shape
+	beta_df_select.columns
+
+	a2 = [bool(x in a00) for x in a0]; a2[:8]
+	# a2.count(True)
+	dtm_select1 = dtm_select.loc[:, a2]; dtm_select1.shape
+
+	# routine 2 extract dtm_sub for particular topic
+	beta_df_logi1 = beta_df_select
+	beta_df_maxVals = []
+
+	# Go colm by colm and extract maxVal for each row
+	for i1 in range(beta_df_select.shape[0]):
+		a0 = max(beta_df_select.iloc[i1, 1:]); a0
+		beta_df_maxVals.append(a0)
+
+	# eval each colm for maxVal incidence
+	for i2 in range(1, beta_df_select.shape[1], 1):
+		logi1 = [bool(beta_df_select.iloc[x, i2] == beta_df_maxVals[x]) for x in range(beta_df_select.shape[0])]
+		beta_df_logi1.iloc[:, i2] = logi1
+   	
+	return dtm_select1, beta_df_select, beta_df_logi1
