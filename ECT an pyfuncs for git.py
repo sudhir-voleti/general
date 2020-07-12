@@ -62,7 +62,7 @@ def keyphrase_resub(series0):
 def sampl_frame(a0):
 	filename0 = a0['fileName']; filename0
 	doc0 = a0['sents']
-	sent_list0 = nltk.sent_tokenize(doc0); sent_list0
+	sent_list0 = sent_tokenize(doc0); sent_list0
 	n1 = len(sent_list0); n1
 	nchar0 = list(map(lambda x: len(x), sent_list0)); nchar0
 	filename00 = [filename0]*n1; filename00
