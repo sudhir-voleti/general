@@ -58,6 +58,7 @@ def keyphrase_resub(series0):
 	return(a2)
 
 # func 2c - text -cleaning
+from nltk import word_tokenize
 def text_clean0(text):
    
     text = re.sub('<.*?>', '', str(text))    
@@ -66,7 +67,7 @@ def text_clean0(text):
     text = re.sub('\$', 'dollar', text)
     text = re.sub('%', 'percent', text)	
     
-    text = nltk.word_tokenize(str(text))
+    text = word_tokenize(str(text))
     text = [word.lower() for word in text] # lowercase text
     text = [wnl.lemmatize(i) for i in text]  # lemmatize away plurals
     
