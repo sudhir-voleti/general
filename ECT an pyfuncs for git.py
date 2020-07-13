@@ -59,6 +59,9 @@ def keyphrase_resub(series0):
 
 # func 2c - text -cleaning
 from nltk import word_tokenize
+from nltk.stem import WordNetLemmatizer,SnowballStemmer
+stopword_list = nltk.corpus.stopwords.words('english')
+wnl = WordNetLemmatizer()
 def text_clean0(text):
    
     text = re.sub('<.*?>', '', str(text))    
