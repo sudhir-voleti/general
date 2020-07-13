@@ -167,19 +167,21 @@ def dtm_reshape(dtm_model, dtm_corpus, vect_model, vect_corpus):
 	new_colms = csr_matrix((dtm_corpus.shape[0], len(index_non_overlapping))); new_colms.shape
 	old_colms_mat = dtm_corpus[:,index_overlapping]; old_colms_mat.shape
 	# now np.hstack(x1, x2) the 2 csr matrices x1,x2
-	new_csr_mat = hstack((old_colms_mat, new_colms)); new_csr_mat.shape # 505k x 27k
+	new_csr_mat = hstack((old_colms_mat, new_colms))
+	print(new_csr_mat.shape) # 505k x 27k
 
 	# now sort colms to get same order as dtm1 tokens
 	a0 = [feat1[x] for x in index_non_overlapping]; a0[:8]
 	a1 = [feat2[x] for x in index_overlapping]; a1[:8]
 	a2 = a1 + a0; a2[:8]
 	a3 = np.asarray(a2); a3.shape
-	err_inds, sorted_ind = npwhere2ind(a3, feat1)
+	sorted_ind, err_inds = npwhere2ind(a3, feat1)
 
 	new_csr_mat = new_csr_mat.tocsr() # [:,sorted_ind]
 	new_csr_mat = new_csr_mat[:,sorted_ind]
-
+	print(new_csr_mat.shape)
 	return(new_csr_mat)  # whew.
+
 
 ## func 5a - unit func for summarizing relevant sents back to docs
 def file2subdf(i0, df80k, df910, a1, num_keyword_sents1, sents1):
