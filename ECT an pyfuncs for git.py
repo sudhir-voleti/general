@@ -57,6 +57,24 @@ def keyphrase_resub(series0):
 	a2 = pd.Series(a1)
 	return(a2)
 
+# func 2c - text -cleaning
+def text_clean0(text):
+   
+    text = re.sub('<.*?>', '', str(text))    
+    text = re.sub('\d+[,\.]?\d+', '', text)	
+    text = re.sub('-', '_', text)
+    text = re.sub('\$', 'dollar', text)
+    text = re.sub('%', 'percent', text)	
+    
+    text = nltk.word_tokenize(str(text))
+    text = [word.lower() for word in text] # lowercase text
+    text = [wnl.lemmatize(i) for i in text]  # lemmatize away plurals
+    
+    text = [word for word in text if word not in stopword_list] # drop stopwords
+    #text = [word for word in text if word.isalpha()] # drop all non-alphabetic tokens  
+
+    return ' '.join(text)
+
 
 # func 3a - create & sample from sent-sampling frame. Unit func below
 def sampl_frame(a0):
@@ -77,7 +95,7 @@ def build_sampl_frame(df01):
 		a0 = df01.iloc[i0,:]; a0
 		out_df0 = sampl_frame(a0)  # use unit func abv
 		df0_sampl_frame = df0_sampl_frame.append(out_df0)
-		if i0%1000==0:
+		if i0%10000==0:
 			print(i0)
 
 	return(df0_sampl_frame)
