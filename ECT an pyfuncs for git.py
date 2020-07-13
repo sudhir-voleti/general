@@ -214,7 +214,7 @@ def sent2doc(df80k, df910):
 		filename1.append(df80k['fileName'].iloc[i0])
 		num_sents1.append(df80k['num_sents'].iloc[i0])
 		num_keyword_sents1, sents1 = file2subdf(i0, df80k, df910, a1, num_keyword_sents1, sents1)
-		if i0%1000==0:
+		if i0%10000==0:
 			print(i0)
 
 	df80k_pr = pd.DataFrame({'fileName':filename1, 'num_sents': num_sents1, 
