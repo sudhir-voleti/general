@@ -149,7 +149,7 @@ def npwhere2ind(list1, list2): # list1 is large list from whch 2 lookup, list2 s
 			continue
 		a22 = int(str(a21[0]).strip('[]')); a22
 		out_ind.append(a22)
-		if i0%1000 == 0:
+		if i0%10000 == 0:
 			print(i0)
 	return([out_ind, err_inds])
 
@@ -179,7 +179,7 @@ def dtm_reshape(dtm_model, dtm_corpus, vect_model, vect_corpus):
 	new_csr_mat = new_csr_mat.tocsr() # [:,sorted_ind]
 	new_csr_mat = new_csr_mat[:,sorted_ind]
 
-	return(new_csr_mat.shape)  # whew.
+	return(new_csr_mat)  # whew.
 
 ## func 5a - unit func for summarizing relevant sents back to docs
 def file2subdf(i0, df80k, df910, a1, num_keyword_sents1, sents1):
