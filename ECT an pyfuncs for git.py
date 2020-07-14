@@ -4,8 +4,27 @@ Created on Sun Jul 12 13:15:39 2020
 
 @author: 20052
 """
+# func 1a - decontraction
+def decontracted(series0):
 
-# func 1 - revise phrases & ngrams in sents
+	# specific    
+	a1 = list(map(lambda x: re.sub(r"won\'t", "will not", x), series0))
+	a1 = list(map(lambda x: re.sub(r"can\'t", "can not", x), a1))    
+
+	# general
+	a1 = list(map(lambda x: re.sub(r"n\'t", " not", x), a1))    
+	a1 = list(map(lambda x: re.sub(r"\'re", " are", x), a1))    
+	a1 = list(map(lambda x: re.sub(r"\'s", " is", x), a1))    
+	a1 = list(map(lambda x: re.sub(r"\'d", " would", x), a1))    
+	a1 = list(map(lambda x: re.sub(r"\'ll", " will", x), a1))    
+	a1 = list(map(lambda x: re.sub(r"\'t", " not", x), a1))    
+	a1 = list(map(lambda x: re.sub(r"\'ve", " have", x), a1))    
+	a1 = list(map(lambda x: re.sub(r"\'m", " am", x), a1))    
+
+	a2 = pd.Series(a1)
+	return(a2)
+
+# func 1b - revise phrases & ngrams in sents
 def cleanSeries2list(series0):
 	a1 = list(map(lambda x: re.sub("forward[-\s]{1,}looking", "forward-looking", x), series0))
 	a1 = list(map(lambda x: re.sub("new\s*prod", "new-prod", x), a1))
