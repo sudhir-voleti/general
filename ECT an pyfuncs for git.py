@@ -147,7 +147,7 @@ def build_sampl_frame_iter(df01, stepsize):
 		df01_sub = df01.iloc[start0:stop0,:]; df01_sub
 		a00 = build_sampl_frame(df01_sub) # 50 s per 10k rows
 		store_list.append(a00)
-		#print("processed upto: ", stop0)
+		print("processed upto: ", stop0)
 
 	a0 = store_list[0]; a0
 	for i1 in range(1, len(store_list)):
