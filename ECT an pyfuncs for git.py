@@ -241,4 +241,51 @@ def sent2doc(df80k, df910):
 
 	return(df80k_pr)
 
+"""
+Below requires that keyword_list be pre-specified. Typically iteratively done.
+"""
 
+# func 6a - intermed func for kryword detection in sampled sents. 
+def detect_keywrds(keyword_stems, text0):
+	keywrd_list = []
+	for i0 in range(len(keyword_stems)):
+		regex = '\\b' + keyword_stems[i0] + '\w*'; regex
+		a0 = re.findall(regex, text0); a0
+		if len(a0) > 0:
+			# keywrd_list.append(str(a0).strip('[]').strip('\''))	
+			keywrd_list.extend(a0)	
+	return(keywrd_list)
+
+# test-drive
+#text0 = "innovative technology and patent based solutions are absolutely what we do uniquely well."; text0
+#%time a1 = detect_keywrds(keyword_list, text0); a1
+
+## func 6b: wrapper func. 
+def extract_keyword_compts(series0, keyword_stems):
+
+	keywrds_colm = []; keywrds_num = []; 
+
+	for i1 in range(series0.shape[0]):
+		text0 = series0.iloc[i1]
+		if type(text0) != str:
+			text0 = 'empty row'
+
+		a1 = detect_keywrds(keyword_stems, text0.lower()); a1 # list
+		a2 = list(set(a1))
+		a2.sort()  # sort list elems alphabetically
+
+		keywrds_colm.append(a2)
+		keywrds_num.append(len(a2))
+
+		if i1%1000 == 0:
+			print(i1)
+
+	print(len(keywrds_colm), len(keywrds_num), series0.shape[0])
+	df_out = pd.DataFrame({'keywords':keywrds_colm, 'num_keywords':keywrds_num})
+	return(df_out)
+
+# test-drive
+#%time df_out = extract_keyword_compts(df01['sents'], keyword_list) # 1.6s
+#df01 = df01.drop(['keywords', 'num_keywords'], axis = 1); df01.columns
+#df01.insert(4, 'keywords', df_out['keywords']); df01.columns
+#df01.insert(5, 'num_keywords', df_out['num_keywords']); df01.columns
