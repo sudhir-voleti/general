@@ -211,8 +211,9 @@ def dtm_reshape(dtm_model, dtm_corpus, vect_model, vect_corpus):
 ## func 5a - unit func for summarizing relevant sents back to docs
 def file2subdf(i0, df80k, df910, a1, num_keyword_sents1, sents1):
 	a2 = np.where(a1 == df80k['fileName'].iloc[i0]); a2 # 0.09 s    
-	a23 = re.sub(r'[\n?]','', str(a2)); a23
-	a20 = re.findall('\[.+]', a23); a20
+	#a23 = re.sub(r'[\n?]','', str(a2)); a23
+	#a20 = re.findall('\[.+]', a23); a20
+	a23 = np.array(a2).tolist(); a20 = a23[0][0]; a20
 
 	if len(a20) == 0:
 		num_keyword_sents1.append(0)
@@ -220,8 +221,8 @@ def file2subdf(i0, df80k, df910, a1, num_keyword_sents1, sents1):
 		sents1.append(sents0)
 
 	else:
-		a21 = str(a20[0]).strip('[]').split(","); a21
-		a22 = [int(x) for x in a21]; a22
+		#a21 = str(a20[0]).strip('[]').split(","); a21
+		a22 = [int(x) for x in a20]; a22
 		df_sub0 = df910.iloc[a22,:]; df_sub0
 		df_sub1 = df_sub0[df_sub0['relevant']==1]; df_sub1
 		num_keyword_sents1.append(df_sub1.shape[0]); num_keyword_sents1
