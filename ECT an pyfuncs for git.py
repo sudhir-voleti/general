@@ -222,7 +222,7 @@ def file2subdf(i0, df80k, df910, a1, num_keyword_sents1, sents1):
 
 	else:
 		#a21 = str(a20[0]).strip('[]').split(","); a21
-		a22 = [int(x) for x in a20]; a22
+		a22 = a20 # [int(x) for x in a20]; a22
 		df_sub0 = df910.iloc[a22,:]; df_sub0
 		df_sub1 = df_sub0[df_sub0['relevant']==1]; df_sub1
 		num_keyword_sents1.append(df_sub1.shape[0]); num_keyword_sents1
