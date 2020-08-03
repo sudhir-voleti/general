@@ -213,7 +213,7 @@ def file2subdf(i0, df80k, df910, a1, num_keyword_sents1, sents1):
 	a2 = np.where(a1 == df80k['fileName'].iloc[i0]); a2 # 0.09 s    
 	#a23 = re.sub(r'[\n?]','', str(a2)); a23
 	#a20 = re.findall('\[.+]', a23); a20
-	a23 = np.array(a2).tolist(); a20 = a23[0][0]; a20
+	a23 = np.array(a2).tolist(); a20 = a23[0]; a20
 
 	if len(a20) == 0:
 		num_keyword_sents1.append(0)
