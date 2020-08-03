@@ -81,7 +81,7 @@ from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer,SnowballStemmer
 stopword_list = nltk.corpus.stopwords.words('english')
 wnl = WordNetLemmatizer()
-def text_clean0(text, lemmatize, stopwords):  # lemmatize = 0 by default
+def text_clean0(text, lemmatize=1, stopwords=1):  # lemmatize = 0 by default
    
 	text = re.sub('<.*?>', '', str(text))    
 	text = re.sub('\d+[,\.]?\d+', '', text)	
