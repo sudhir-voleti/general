@@ -296,3 +296,48 @@ def extract_keyword_compts(series0, keyword_stems):
 #df01 = df01.drop(['keywords', 'num_keywords'], axis = 1); df01.columns
 #df01.insert(4, 'keywords', df_out['keywords']); df01.columns
 #df01.insert(5, 'num_keywords', df_out['num_keywords']); df01.columns
+
+## for model development
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+from xgboost import XGBClassifier
+from sklearn.ensemble import RandomForestClassifier
+
+
+# for model evaluation
+from sklearn import model_selection
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
+from sklearn.model_selection import StratifiedKFold
+
+# Hyper parameter tuning
+from sklearn.model_selection import GridSearchCV
+import pickle
+
+# func 2b: run ML model
+def opt_logreg_apply(dtm0, yseries0):
+
+	train_x1, valid_x1, train_y1, valid_y1 = model_selection.train_test_split(dtm0, yseries0, random_state=0)
+
+	# in the following code we will do the grid search on available parameters
+	c_params =[0.01,1,10,100] # np.linspace(0.01,1000,100)
+	tuned_params = [{'C':c_params, "penalty":["l2","l1"]}]    
+	lr_grid = GridSearchCV(estimator=LogisticRegression(max_iter=15000, random_state=0, solver='liblinear'),
+                   param_grid = tuned_params, cv = 5, scoring = "accuracy")
+
+	# lets fit the model on training dataset
+	%time lr_grid.fit(train_x1, train_y1)  # 4 s
+	print(lr_grid.best_params_)
+	y_pred_valid = lr_grid.predict(valid_x1)
+	print(f'Accuracy on test dataset : {round(accuracy_score(y_pred_valid,valid_y1),2)*100} %')
+
+	# redefine opt model now
+	parms_list = list(lr_grid.best_params_.values())
+	model0 = LogisticRegression(max_iter=15000,random_state=0, solver='liblinear', penalty=parms_list[1], C=parms_list[0])
+	model0.fit(train_x1, train_y1)  # imp step b4 outputting model0  
+	return(model0, parms_list)
+
+# %time model0, parms_list = opt_logreg_apply(dtm_tf, df01['dem'])
+
