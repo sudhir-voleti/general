@@ -341,3 +341,66 @@ def opt_logreg_apply(dtm0, yseries0):
 
 # %time model0, parms_list = opt_logreg_apply(dtm_tf, df01['dem'])
 
+## Find lexical features for each doc
+from lexical_diversity import lex_div as ld
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer 
+analyzer = SentimentIntensityAnalyzer()
+
+def build_aux_metrics(filename_series, doc_series):
+	lex_vol = []; ttr = []; mtld = []; vocd = []  # lexical div measures
+	neg_mean = []; neu_mean = []; pos_mean = []; compound_mean = []
+	neg_std = []; neu_std = []; pos_std = []; compound_std = []    
+	filename = []  # sentiment measures
+
+	for i0 in range(len(doc_series)):
+
+		filename0 = filename_series.iloc[i0]; filename0
+		doc0 = doc_series.iloc[i0]; doc0
+		doc0_list = nltk.sent_tokenize(doc0); doc0_list
+		doc0_string = " ".join(doc0_list); doc0_string
+		n1 = len(doc0_list); n1
+
+		if n1 > 1:
+			vs_list = []	
+			for i1 in range(n1):
+				sent0 = doc0_list[i1]
+				vs0 = analyzer.polarity_scores(sent0); vs0
+				vs_list.append(vs0)
+	
+			doc0_df = pd.DataFrame(vs_list); doc0_df	
+			mean_list0 = [x for x in doc0_df.mean()]; mean_list0
+			std_list0 = [x for x in doc0_df.std()]; std_list0
+
+		else:
+			mean_list0 = [float(0) for x in range(4)]; mean_list0
+			std_list0 = [float(0) for x in range(4)]; std_list0
+
+		neg_mean.append(mean_list0[0]); neu_mean.append(mean_list0[1])
+		pos_mean.append(mean_list0[2]); compound_mean.append(mean_list0[3])                        		
+		neg_std.append(std_list0[0]); neu_std.append(std_list0[1])
+		pos_std.append(std_list0[2]); compound_std.append(std_list0[3])                        
+		filename.append(filename0)
+
+		flt = ld.flemmatize(doc0_string); flt
+		lex_vol0 = len(flt)  # lexical volume measure
+		ttr0 = ld.ttr(flt)  # basic Text-Type Ratio or TTR
+		mtld0 = ld.mtld(flt) # Measure of Textual Lexical Diversity (MTLD) for lexical variability
+		vocd0 = ld.hdd(flt) # vocd or Hypergeometric distribution D (HDD), as per McCarthy and Jarvis (2007, 2010)
+
+		lex_vol.append(lex_vol0)
+		ttr.append(ttr0)
+		mtld.append(mtld0)
+		vocd.append(vocd0)
+
+		if i0%1000 == 0:
+			print(i0)
+
+	# save as df
+	df1 = pd.DataFrame({'filename':filename, 
+                     'senti_neg': neg_mean, 'senti_neu': neu_mean, 'senti_pos': pos_mean, 'senti_compound': compound_mean,
+                     'senti_neg_std': neg_std, 'senti_neu_std': neu_std, 'senti_pos_std': pos_std, 'senti_compound_std': compound_std,
+                      'lex_vol':lex_vol, 'ttr':ttr, 'mtld':mtld, 'vocd':vocd})
+	return(df1)
+
+# %time df_senti = build_aux_metrics(df80k['fileName'], df80k['sents']) # 7 min
+
