@@ -392,7 +392,7 @@ def build_aux_metrics(filename_series, doc_series):
 		mtld.append(mtld0)
 		vocd.append(vocd0)
 
-		if i0%1000 == 0:
+		if i0%5000 == 0:
 			print(i0)
 
 	# save as df
