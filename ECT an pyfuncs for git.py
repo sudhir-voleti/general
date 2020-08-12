@@ -322,7 +322,7 @@ from sklearn.model_selection import GridSearchCV
 import pickle
 
 # func 2b: run ML model
-def opt_logreg_apply(dtm0, yseries0):
+def opt_logreg_apply(dtm0, yseries0, cv1=5):
 
 	train_x1, valid_x1, train_y1, valid_y1 = model_selection.train_test_split(dtm0, yseries0, random_state=0)
 
@@ -330,7 +330,7 @@ def opt_logreg_apply(dtm0, yseries0):
 	c_params =[0.01,1,10,100] # np.linspace(0.01,1000,100)
 	tuned_params = [{'C':c_params, "penalty":["l2","l1"]}]    
 	lr_grid = GridSearchCV(estimator=LogisticRegression(max_iter=15000, random_state=0, solver='liblinear'),
-                   param_grid = tuned_params, cv = 5, scoring = "accuracy")
+                   param_grid = tuned_params, cv = cv1, scoring = "accuracy")
 
 	# lets fit the model on training dataset
 	lr_grid.fit(train_x1, train_y1)  # 4 s
