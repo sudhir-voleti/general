@@ -4,7 +4,7 @@ Created on Sun Jul 12 13:15:39 2020
 
 @author: 20052
 """
-import feather
+import feather, re
 import nltk
 import pandas as pd
 import numpy as np
@@ -82,7 +82,7 @@ def keyphrase_resub(series0):
 	return(a2)
 
 # func 2c - text -cleaning
-from nltk import word_tokenize
+from nltk import word_tokenize, sent_tokenize
 from nltk.stem import WordNetLemmatizer,SnowballStemmer
 stopword_list = nltk.corpus.stopwords.words('english')
 wnl = WordNetLemmatizer()
