@@ -4,6 +4,11 @@ Created on Sun Jul 12 13:15:39 2020
 
 @author: 20052
 """
+import feather
+import nltk
+import pandas as pd
+import numpy as np
+
 # func 1a - decontraction
 def decontracted(series0):
 
