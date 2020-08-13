@@ -454,3 +454,35 @@ def dtm2adjacen(dtm, tf_vect, cutoff=200):
 	adjacen1.columns = colnames0
 	adjacen1.index = colnames0	
 	return(adjacen1)
+
+## home brewing a cosine simil func​
+import numpy as np
+def cos_simil(vec_a, vec_b):
+    vec_a = np.array(vec_a)
+    vec_b = np.array(vec_b)
+    
+    numer = np.dot(vec_a, vec_b)
+    abs_vec_a = sum(vec_a*vec_a)**0.5
+    abs_vec_b = sum(vec_b*vec_b)**0.5
+    denom = abs_vec_a *abs_vec_b
+
+    cos1 = numer/denom
+    return(cos1)
+
+# doc2vec model
+def simil_corpus(model, dem_stmt1, k = len(model.docvecs)):
+
+	test_doc_tokenized = word_tokenize(dem_stmt1.lower()); test_doc_tokenized
+	v1 = model.infer_vector(test_doc_tokenized); v1
+	# %time a0 = cos_simil(v1, model.docvecs[1]); a0 # 0.015s
+
+	simil_scores1 = []
+	for i0 in range(k): # len(model.docvecs)
+		simil0 = cos_simil(v1, model.docvecs[i0])
+		simil_scores1.append(simil0)
+		if i0%5000 == 0:
+			print(i0)
+
+	return(simil_scores1)
+
+%time simil_list1 = simil_corpus(model, dem_stmt1) # 9.9s	
