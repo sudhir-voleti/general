@@ -409,3 +409,48 @@ def build_aux_metrics(filename_series, doc_series):
 
 # %time df_senti = build_aux_metrics(df80k['fileName'], df80k['sents']) # 7 min
 
+## --- try basic wordcl plotting in py
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+
+def build_wordcl(text_series0):
+	text = " ".join(review for review in text_series0) # 0.07s
+
+	# Create stopword list:
+	stopwords = set(STOPWORDS)
+	#stopwords.update(["drink", "now", "wine", "flavor", "flavors"])
+
+	# Generate a word cloud image
+	wordcloud = WordCloud(stopwords=stopwords, background_color="white").generate(text) # 9.1s
+
+	# Display the generated image:
+	plt.imshow(wordcloud, interpolation='bilinear')
+	plt.axis("off")
+	plt.show()
+
+#%time build_wordcl(df_dem_sents.cleaned_sents_2) # 9.8s
+
+# func 2 build adj_matrix for dendogms and cogs
+def dtm2adjacen(dtm, tf_vect, cutoff=200):
+
+	# make adjacency mat outta dtm
+	adjacen0 = dtm.T*dtm; adjacen0.shape # 2.5s
+	a0 = adjacen0.sum(axis=0).tolist(); len(a0[0]) # 0.03s
+	colsums0 = [int(elem) for elem in a0[0]]; colsums0[:8] # 0.1s
+
+	# sort according to colsums
+	ind0 = np.argsort(np.array(colsums0))[::-1].tolist(); ind0[:8] # 0.01s
+	a0 = adjacen0[:,ind0]; a0.shape
+	a1 = a0[ind0,:]; a1.shape
+	a2 = a1.toarray(); a2.shape
+	np.fill_diagonal(a2, 0); a2[:8,:8]  # make diags zero
+
+	# get feature names	
+	feat1 = tf_vect.get_feature_names(); len(feat1)
+	colnames0 = [feat1[x] for x in ind0[:cutoff]]; colnames0[:8]
+
+	# build DF around the sorted array
+	adjacen1 = pd.DataFrame(a2[:cutoff,:cutoff]); adjacen1.iloc[:8,:8]
+	adjacen1.columns = colnames0
+	adjacen1.index = colnames0	
+	return(adjacen1)
