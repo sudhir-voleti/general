@@ -485,4 +485,4 @@ def simil_corpus(model, dem_stmt1, k = len(model.docvecs)):
 
 	return(simil_scores1)
 
-%time simil_list1 = simil_corpus(model, dem_stmt1) # 9.9s	
+#%time simil_list1 = simil_corpus(model, dem_stmt1) # 9.9s	
