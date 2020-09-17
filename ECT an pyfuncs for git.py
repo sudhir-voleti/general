@@ -486,3 +486,23 @@ def simil_corpus(model, dem_stmt1, k = len(model.docvecs)):
 	return(simil_scores1)
 
 # %time simil_list1 = simil_corpus(model, dem_stmt1) # 9.9s	
+
+## define py func to refine DTMs by top n tokens
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+def series2dtm(series0, min_df1=5, ngram_range1=(1,2), top_n=200):
+
+	# build TF wala dtm
+	tf_vect = CountVectorizer(lowercase=False, min_df=min_df1, ngram_range=ngram_range1)
+	dtm_tf = tf_vect.fit_transform(series0)
+
+	# refine and dimn-reduce dtm to top 10% (say) terms
+	pd0 = pd.Series(dtm_tf.sum(axis=0).tolist()[0])
+	ind0 = pd0.sort_values(ascending=False).index.tolist()[:top_n]
+	feat0 = pd.Series(tf_vect.get_feature_names()).iloc[ind0]
+	dtm_tf1 = dtm_tf[:,ind0].todense()
+	dtm_df = pd.DataFrame(data=dtm_tf1, columns=feat0.tolist())
+
+	return(dtm_df)
+
+# test-drive abv
+# dtm_dem = series2dtm(df00.cleaned_sents_2.iloc[dem_only]) # 6s
