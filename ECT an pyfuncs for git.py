@@ -111,9 +111,9 @@ def text_clean0(text, lemmatize=1, stopwords=1):  # lemmatize = 0 by default
 
 
 # func 3a - create & sample from sent-sampling frame. Unit func below
-def sampl_frame(a0):
-	filename0 = a0['fileName']; filename0
-	doc0 = a0['sents']
+def sampl_frame(filename_series0, sents_series0):
+	filename0 = filename_series0; filename0
+	doc0 = sents_series0; doc0
 	sent_list0 = sent_tokenize(doc0); sent_list0
 	n1 = len(sent_list0); n1
 	nchar0 = list(map(lambda x: len(x), sent_list0)); nchar0
@@ -121,42 +121,44 @@ def sampl_frame(a0):
 	out_df0 = pd.DataFrame({'filename': filename00, 'sents':sent_list0, 'nchar':nchar0})
 	return(out_df0)
 
+
 # func 3b - wrapper of sampl frame builder over a df
-def build_sampl_frame(df01):    
+def build_sampl_frame(filename_series0, sents_series0):    
 	df0_sampl_frame = pd.DataFrame(columns = ['filename', 'sents', 'nchar'])    
-
-	for i0 in range(df01.shape[0]):
-		a0 = df01.iloc[i0,:]; a0
-		out_df0 = sampl_frame(a0)  # use unit func abv
+	for i0 in range(len(filename_series0)):
+		# a0 = df01.iloc[i0,:]; a0
+		filename0 = filename_series0.iloc[i0]; filename0
+		doc0 = sents_series0.iloc[i0]; doc0
+		out_df0 = sampl_frame(filename0, doc0)  # use unit func abv
 		df0_sampl_frame = df0_sampl_frame.append(out_df0)
-		if i0%10000==0:
+		if i0%5000==0:
 			print(i0)
-
 	return(df0_sampl_frame)
+
 
 """
 Since build_sampl_frame() repeatedly appends rows to a  DF, longer it runs, heavier the DF becomes and longer it takes
-
 So, am breaking up the proc into steps of 10k rows each, using a small routine to help. behold.
 """
 
 # func 3c - intermed func for start and stop points for func repeats
-def start_stop_iters(df01, stepsize):
-	start_list = [x for x in range(0, (df01.shape[0] - stepsize), stepsize)];  start_list
-	stop_list = [x for x in range(start_list[1], df01.shape[0], stepsize)]; stop_list
+def start_stop_iters(filename_series0, stepsize):
+	start_list = [x for x in range(0, (len(filename_series0) - stepsize), stepsize)];  start_list
+	stop_list = [x for x in range(start_list[1], len(filename_series0), stepsize)]; stop_list
 	start_list.append(stop_list[len(stop_list)-1]); start_list
-	stop_list.append(df01.shape[0]); stop_list
+	stop_list.append(len(filename_series0)); stop_list
 	return(start_list, stop_list)
 
 # func 3d - iterated sampl_frame builder
-def build_sampl_frame_iter(df01, stepsize):
-	start_list, stop_list = start_stop_iters(df01, stepsize)
+def build_sampl_frame_iter(filename_series0, sents_series0, stepsize): 
+	start_list, stop_list = start_stop_iters(filename_series0, stepsize)
 	store_list = []
 	for i0 in range(len(start_list)):
 		start0 = start_list[i0]; start0
 		stop0 = stop_list[i0]; stop0    
-		df01_sub = df01.iloc[start0:stop0,:]; df01_sub
-		a00 = build_sampl_frame(df01_sub) # 50 s per 10k rows
+		file_sub = filename_series0.iloc[start0:stop0]
+		sents_sub = sents_series0.iloc[start0:stop0]
+		a00 = build_sampl_frame(file_sub, sents_sub) # 50 s per 10k rows
 		store_list.append(a00)
 		print("processed upto: ", stop0)
 
@@ -164,6 +166,8 @@ def build_sampl_frame_iter(df01, stepsize):
 	for i1 in range(1, len(store_list)):
 		a0 = a0.append(store_list[i1])
 	return(a0)  # df output
+
+#%time df_sents = build_sampl_frame_iter(df01.fileName, df01.sents1, 5000) # 9.4s for 5k rows
 
 # func 4a utility func to using numpy's fast lookup
 def npwhere2ind(list1, list2): # list1 is large list from whch 2 lookup, list2 smaller one
