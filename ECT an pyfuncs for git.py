@@ -409,6 +409,23 @@ def build_aux_metrics(filename_series, doc_series):
 
 # %time df_senti = build_aux_metrics(df80k['fileName'], df80k['sents']) # 7 min
 
+# --- find rewadability indices for df_sents ---
+import textstat
+def calc_readby(sents_series0):
+	fogIndex=[]; flesch_kincaid=[]; flesch_readby=[];
+	for i0 in range(len(sents_series0)):
+		sent0 = sents_series0[i0]
+		flesch_readby.append(textstat.flesch_reading_ease(sent0))
+		flesch_kincaid.append(textstat.flesch_kincaid_grade(sent0))
+		fogIndex.append(textstat.gunning_fog(sent0))
+		if i0%10000==0:
+			print(i0)
+
+	df_readby = pd.DataFrame({'flesch_readby':flesch_readby, 'flesch_kincaid':flesch_kincaid, 'fogIndex':fogIndex})
+	return(df_readby)
+
+# %time calc_readby(df_merged2.sents1[:10000])
+
 ## --- try basic wordcl plotting in py
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
