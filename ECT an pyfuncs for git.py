@@ -257,6 +257,43 @@ def sent2doc(df80k, df910):
 
 	return(df80k_pr)
 
+## func 5c - sent2doc for stage 2 demsup classifier
+# Single-func for 2nd stage classifn. Custom-func modified from 5a & 5b
+def sent2doc_demsup(df80k, df910):
+	filename1 = []; y_dem_pred = []; y_dem_proba = []; 
+	y_sup_pred = []; y_sup_proba = [];
+	docs = list(df910['filename']); len(docs)
+	a1 = np.asarray(docs)
+
+	for i0 in range(df80k.shape[0]):
+		filename0 = df80k['fileName'].iloc[i0]; filename0
+		a2 = np.where(a1 == filename0); a2 # 0.09 s    
+		a23 = np.array(a2).tolist(); a20 = a23[0]; a20
+
+		if len(a20) == 0:
+			y_dem_pred.append(0); y_dem_proba.append(0);
+			y_sup_pred.append(0); y_sup_proba.append(0);
+
+		else:
+			df_sub0 = df910.iloc[a20,:]; df_sub0
+			y_dem_pred.append(df_sub0['y_pred_dem'].sum())
+			y_dem_proba.append(df_sub0['y_proba_dem'].sum());
+			y_sup_pred.append(df_sub0['y_pred_sup'].sum())
+			y_sup_proba.append(df_sub0['y_proba_sup'].sum());
+
+		if i0%5000==0:
+			print(i0)
+
+	df80k.insert(df80k.shape[1], 'y_dem_pred', y_dem_pred)
+	df80k.insert(df80k.shape[1], 'y_sup_pred', y_sup_pred)
+	df80k.insert(df80k.shape[1], 'y_dem_proba', y_dem_proba)
+	df80k.insert(df80k.shape[1], 'y_sup_proba', y_sup_proba)
+
+	return(df80k)
+
+#df80k = df01_relev1; df910 = df00; df910.iloc[:8, 3:7]
+#%time df80k = sent2doc_demsup(df80k, df910) # 27m
+
 """
 Below requires that keyword_list be pre-specified. Typically iteratively done.
 """
