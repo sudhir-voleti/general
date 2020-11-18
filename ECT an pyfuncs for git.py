@@ -198,10 +198,15 @@ def dtm_reshape(dtm_model, dtm_corpus, vect_model, vect_corpus):
 	a1 = np.asarray(feat2); a1.shape
 	index_overlapping, index_non_overlapping  = npwhere2ind(a1, feat1)
 
-	new_colms = csr_matrix((dtm_corpus.shape[0], len(index_non_overlapping))); new_colms.shape
-	old_colms_mat = dtm_corpus[:,index_overlapping]; old_colms_mat.shape
-	# now np.hstack(x1, x2) the 2 csr matrices x1,x2
-	new_csr_mat = hstack((old_colms_mat, new_colms))
+	if len(index_non_overlapping) > 0:
+		new_colms = csr_matrix((dtm_corpus.shape[0], len(index_non_overlapping))); new_colms.shape
+		old_colms_mat = dtm_corpus[:,index_overlapping]; old_colms_mat.shape
+		# now np.hstack(x1, x2) the 2 csr matrices x1,x2
+		new_csr_mat = hstack((old_colms_mat, new_colms))
+	else:
+		old_colms_mat = dtm_corpus[:,index_overlapping]; old_colms_mat.shape
+		new_csr_mat = old_colms_mat
+
 	print(new_csr_mat.shape) # 505k x 27k
 
 	# now sort colms to get same order as dtm1 tokens
@@ -216,6 +221,25 @@ def dtm_reshape(dtm_model, dtm_corpus, vect_model, vect_corpus):
 	print(new_csr_mat.shape)
 	return(new_csr_mat)  # whew.
 
+## define py func to refine DTMs by top n tokens
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+def series2dtm(series0, min_df1=5, ngram_range1=(1,2), top_n=200):
+
+	# build TF wala dtm
+	tf_vect = CountVectorizer(lowercase=False, min_df=min_df1, ngram_range=ngram_range1)
+	dtm_tf = tf_vect.fit_transform(series0)
+
+	# refine and dimn-reduce dtm to top 10% (say) terms
+	pd0 = pd.Series(dtm_tf.sum(axis=0).tolist()[0])
+	ind0 = pd0.sort_values(ascending=False).index.tolist()[:top_n]
+	feat0 = pd.Series(tf_vect.get_feature_names()).iloc[ind0]
+	dtm_tf1 = dtm_tf[:,ind0].todense()
+	dtm_df = pd.DataFrame(data=dtm_tf1, columns=feat0.tolist())
+
+	return(dtm_df)
+
+# test-drive abv
+# dtm_dem = series2dtm(df00.cleaned_sents_2.iloc[dem_only]) # 6s
 
 ## func 5a - unit func for summarizing relevant sents back to docs
 def file2subdf(i0, df80k, df910, a1, num_keyword_sents1, sents1):
@@ -544,23 +568,3 @@ def simil_corpus(model, dem_stmt1, k = len(model.docvecs)):
 	return(simil_scores1)
 
 # %time simil_list1 = simil_corpus(model, dem_stmt1) # 9.9s	
-
-## define py func to refine DTMs by top n tokens
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-def series2dtm(series0, min_df1=5, ngram_range1=(1,2), top_n=200):
-
-	# build TF wala dtm
-	tf_vect = CountVectorizer(lowercase=False, min_df=min_df1, ngram_range=ngram_range1)
-	dtm_tf = tf_vect.fit_transform(series0)
-
-	# refine and dimn-reduce dtm to top 10% (say) terms
-	pd0 = pd.Series(dtm_tf.sum(axis=0).tolist()[0])
-	ind0 = pd0.sort_values(ascending=False).index.tolist()[:top_n]
-	feat0 = pd.Series(tf_vect.get_feature_names()).iloc[ind0]
-	dtm_tf1 = dtm_tf[:,ind0].todense()
-	dtm_df = pd.DataFrame(data=dtm_tf1, columns=feat0.tolist())
-
-	return(dtm_df)
-
-# test-drive abv
-# dtm_dem = series2dtm(df00.cleaned_sents_2.iloc[dem_only]) # 6s
