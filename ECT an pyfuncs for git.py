@@ -241,10 +241,11 @@ def series2dtm(series0, min_df1=5, ngram_range1=(1,2), top_n=200):
 # test-drive abv
 # dtm_dem = series2dtm(df00.cleaned_sents_2.iloc[dem_only]) # 6s
 
-## func 5 - sent2doc for relev classifier
-def sent2doc_relev(docname_series0, sents_filename_series0, df_doc, df_sents):
+## func 5c - sent2doc for relev classifier
+def sent2doc_relev(docname_series0, sents_filename_series0, df_sents_series0, df_doc, df_sents):
 
 	y_relev_pred = []; y_relev_proba = []; 
+	relev_hyp_sents = []
 	docs = list(sents_filename_series0); len(docs)
 	a1 = np.asarray(docs)
 
@@ -255,21 +256,26 @@ def sent2doc_relev(docname_series0, sents_filename_series0, df_doc, df_sents):
 
 		if len(a20) == 0:
 			y_relev_pred.append(0); y_relev_proba.append(0);
+			relev_hyp_sents.append('empty doc')
 		else:
 			df_sub0 = df_sents.iloc[a20,:]; df_sub0
+			df_sub0_sents = df_sents_series0[a20]
+			relev_hyp_sents0 = ' '.join(df_sub0_sents.tolist())  # hardcoded 'sents' here
+			relev_hyp_sents.append(relev_hyp_sents0)
 			y_relev_pred.append(df_sub0['y_pred_relev'].sum()); y_relev_pred
 			y_relev_proba.append(df_sub0['y_proba_relev'].mean()); y_relev_proba
 
-		if i0%5000==0:
+		if i0%1000==0:
 			print(i0)
 
+	df_doc.insert(df_doc.shape[1], 'hyp_sents_relev', relev_hyp_sents)
 	df_doc.insert(df_doc.shape[1], 'y_relev_pred', y_relev_pred)
 	df_doc.insert(df_doc.shape[1], 'y_relev_proba', y_relev_proba)
 
 	return(df_doc)
 
 # test-drive abv
-#%time df_test = sent2doc_relev(df0.filename, sampl_frame0.filename, df0.iloc, sampl_frame0)
+#%time df_test = sent2doc_relev(df0.filename, sampl_frame0.filename, sampl_frame0.sents, df0, sampl_frame0)
 
 ## func 5a - unit func for summarizing relevant sents back to docs
 def file2subdf(i0, df80k, df910, a1, num_keyword_sents1, sents1):
