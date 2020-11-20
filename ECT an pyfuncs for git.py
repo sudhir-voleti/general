@@ -617,12 +617,13 @@ def cos_simil(vec_a, vec_b):
     return(cos1)
 
 # doc2vec model
-def simil_corpus(model, dem_stmt1, k = len(model.docvecs)):
+def simil_corpus(model, dem_stmt1):
 
 	test_doc_tokenized = word_tokenize(dem_stmt1.lower()); test_doc_tokenized
 	v1 = model.infer_vector(test_doc_tokenized); v1
 	# %time a0 = cos_simil(v1, model.docvecs[1]); a0 # 0.015s
-
+	k = len(model.docvecs)
+	
 	simil_scores1 = []
 	for i0 in range(k): # len(model.docvecs)
 		simil0 = cos_simil(v1, model.docvecs[i0])
