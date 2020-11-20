@@ -376,7 +376,6 @@ from sklearn.svm import SVC
 from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
 
-
 # for model evaluation
 from sklearn import model_selection
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
@@ -385,6 +384,42 @@ from sklearn.model_selection import StratifiedKFold
 # Hyper parameter tuning
 from sklearn.model_selection import GridSearchCV
 import pickle
+
+# func 2a: run a battery of ML models
+def opt_MLCV_clf(dtm_x, yseries0, n_splits0=5):
+	
+	seed = 42
+	# prepare models
+	models = []
+	models.append(('LR', LogisticRegression(solver='lbfgs')))
+	models.append(('KNN', KNeighborsClassifier()))
+	models.append(('CART', DecisionTreeClassifier()))
+	models.append(('SVM', SVC(gamma='auto')))
+	models.append(('XGBoost',XGBClassifier()))
+	models.append(('RANDOMFOREST',RandomForestClassifier(n_estimators=100)))
+
+	# evaluate each model in turn
+	results = [] # storing accuracy for each model for every iteration
+	names = [] # list of models used
+	mean_score = [] # mean accuracy of each mode after running k iteration
+	mean_std = [] # standard deviation of accuracy for each model
+	scoring = 'accuracy'
+
+	for name, model in models:
+		kfold = model_selection.StratifiedKFold(n_splits=n_splits0, random_state=seed,shuffle=True)
+		cv_results = model_selection.cross_val_score(model, dtm_x, yseries0, cv=kfold, scoring=scoring)
+		mean_score.append(round(cv_results.mean(),2))
+		mean_std.append(round(cv_results.std(),2))
+		results.append(cv_results)
+		names.append(name)
+
+	d = {'Model_Name':names,'Mean_Accuracy':mean_score,'STD':mean_std}
+	score_df = pd.DataFrame(d)
+	return(score_df)
+
+# test-drive opt_MLCV_clf()
+#%time score_idf = opt_MLCV_clf(dtm_idf_model, df_labeled.relevant, n_splits0=5) # 2m 43s
+#score_idf
 
 # func 2b: run ML model
 def opt_logreg_apply(dtm0, yseries0, cv1=5):
