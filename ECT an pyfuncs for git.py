@@ -235,11 +235,24 @@ def series2dtm(series0, min_df1=5, ngram_range1=(1,2), top_n=200):
 	feat0 = pd.Series(tf_vect.get_feature_names()).iloc[ind0]
 	dtm_tf1 = dtm_tf[:,ind0].todense()
 	dtm_df = pd.DataFrame(data=dtm_tf1, columns=feat0.tolist())
+	print("TF wala dtm done\n")
 
-	return(dtm_df)
+	# build IDF wala dtm
+	idf_vect = TfidfVectorizer(lowercase=False, min_df=min_df1, ngram_range=ngram_range1)
+	dtm_idf = idf_vect.fit_transform(series0)
+
+	# refine and dimn-reduce dtm to top 10% (say) terms
+	pd0 = pd.Series(dtm_idf.sum(axis=0).tolist()[0])
+	ind0 = pd0.sort_values(ascending=False).index.tolist()[:top_n]
+	feat0 = pd.Series(idf_vect.get_feature_names()).iloc[ind0]
+	dtm_idf1 = dtm_idf[:,ind0].todense()
+	dtm_idf = pd.DataFrame(data=dtm_idf1, columns=feat0.tolist())
+	print("IDF wala dtm done\n")
+
+	return(dtm_df, dtm_idf)
 
 # test-drive abv
-# dtm_dem = series2dtm(df00.cleaned_sents_2.iloc[dem_only]) # 6s
+# dtm_dem, dtm_dem_idf = series2dtm(df00.cleaned_sents_2.iloc[dem_only]) # 6s
 
 ## func 5c - sent2doc for relev classifier
 def sent2doc_relev(docname_series0, sents_filename_series0, df_sents_series0, df_doc, df_sents):
