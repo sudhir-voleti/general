@@ -30,11 +30,11 @@ lemma = WordNetLemmatizer()
 stop_words = stopwords.words('english')
 
 ## routine 1 - textclean per doc
-def textClean(corpus_raw):
+def textClean(corpus_raw, stop_words0):
     text1 = [strip_punctuation(doc) for doc in corpus_raw]
     text1 = [strip_tags(doc) for doc in text1]
     text1 = [strip_numeric(doc) for doc in text1]
-    text1 = [[" ".join([i for i in doc.lower().split() if i not in stop_words])] for doc in text1]
+    text1 = [[" ".join([i for i in doc.lower().split() if i not in stop_words0])] for doc in text1]
     text2 = [[word for word in ' '.join(doc).split()] for doc in text1]
     normalized = [[" ".join([lemma.lemmatize(word) for word in ' '.join(doc).split()])] for doc in text1]
     return normalized
@@ -154,8 +154,8 @@ def domi_topic_df(gamma_df, optimal_model):
 	return(sent_topics_df)    
 
 ## Routine 6 - processing raw data
-def build_gensim_corpus(corpus_raw):
-    corpus_cleaned = textClean(corpus_raw)  # corpus cleaned of html tags, puncs, lemmas
+def build_gensim_corpus(corpus_raw, stop_words0):
+    corpus_cleaned = textClean(corpus_raw, stop_words0)  # corpus cleaned of html tags, puncs, lemmas
     corpus_tokenized = [[word for word in ' '.join(doc).split()] for doc in corpus_cleaned]  # word_tokenize first
     id2word = corpora.Dictionary(corpus_tokenized)  # Create Dictionary from word_tokenized corpus
     corpus_gensim = [id2word.doc2bow(text) for text in corpus_tokenized]  # Building gensim corpus. TF DTM creation.
@@ -177,9 +177,9 @@ def ltm_outp_df(model_list, num_topics_list, id2word, K):
     return(beta_df, gamma_df, sent_topics_df)
 
 ## Routine 8 - wrapper over all above funcs
-def ltm_wrapper(corpus_raw, num_topics_list):  # start1, limit1, step1
+def ltm_wrapper(corpus_raw, num_topics_list, stop_words0):  # start1, limit1, step1
     
-    corpus_cleaned, corpus_tokenized, id2word, corpus_gensim = build_gensim_corpus(corpus_raw) 
+    corpus_cleaned, corpus_tokenized, id2word, corpus_gensim = build_gensim_corpus(corpus_raw, stop_words0) 
     print("build_gensim_corpus done.\n")
     # num_topics_list = [x for x in range(start1, limit1, step1)]; num_topics_list
     
