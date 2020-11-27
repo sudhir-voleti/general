@@ -251,6 +251,39 @@ def single_lda_run(corpus_raw, num_topics):
 # num_topics = 8
 # dtm_select1, beta_df_select, beta_df_logi1, gamma_df, beta_df = single_lda_run(corpus_raw, num_topics)
 
+# util unit func to zero-fy all entries in a row except max one
+def _hard_allocate_row(row):
+	row1 = row.apply(lambda x:round(x,6)); row1
+	row1a = (row1 == row1.max())*row1.max(); row1a
+	return(row1a)
+
+def build_shell_beta_df(beta_df, top_n=50):
+	n1 = beta_df.shape[1]
+	beta_df1a = beta_df.iloc[:,1:(n1+1)]; beta_df1a
+
+	#%time beta_df1 = beta_df1a.apply(lambda x: _hard_allocate_row(x), axis=0) # didn't work
+	beta_df0 = beta_df
+	for i0 in range(beta_df.shape[0]):
+		n1 = beta_df.shape[1]
+		row = beta_df.iloc[i0, 1:(n1+1)]
+		row1 = _hard_allocate_row(row)
+		beta_df0.iloc[i0, 1:(n1+1)] = row1
+		if i0%5000==0:
+			print(i0)
+
+	shell_df = pd.DataFrame({'term_no':[(x+1) for x in range(top_n)]}); shell_df
+	for i0 in range(1, beta_df.shape[1]):    
+		sub_beta_df = beta_df.iloc[:,[0, i0]]; sub_beta_df
+		colm_name = sub_beta_df.columns[(sub_beta_df.shape[1]-1)]; colm_name
+		a00 = sub_beta_df.sort_values(by=colm_name, ascending=False); a00
+		a0 = a00.iloc[:top_n,0].tolist(); a0
+		shell_df.insert(shell_df.shape[1], colm_name, a0)
+
+	return(shell_df, beta_df0) 
+
+# test-drive
+#%time shell_df, beta_df0 = hard_allocate_beta_df(beta_df)  # takes time in minutes coz of for loop
+
 ## Routine 9 - Build and display wordclouds
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
