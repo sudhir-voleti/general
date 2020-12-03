@@ -320,7 +320,7 @@ def build_svo(sents_series0, filename_series0):
 	test_svos = []
 	subj_list=[]; verb_list=[]; obj_list=[]
 	for i0 in range(len(sents_series0)):
-		filename0 = filename_series0[i0]; filename0
+		#filename0 = filename_series0[i0]; filename0
 		doc0 = sents_series0[i0]; doc0
 		subj_list0, verb_list0, obj_list0 = _build_svo(doc0)
 		subj_list.append(subj_list0); subj_list
