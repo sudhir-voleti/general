@@ -7,7 +7,8 @@ Created on Thu Dec  3 11:27:40 2020
 
 # https://raw.githubusercontent.com/peter3125/enhanced-subject-verb-object-extraction/master/subject_verb_object_extract.py
 
-import spacy
+import spacy, feather, nltk
+import pandas as pd
 import en_core_web_sm
 from collections.abc import Iterable
 
