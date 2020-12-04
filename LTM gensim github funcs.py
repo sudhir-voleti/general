@@ -284,6 +284,45 @@ def build_shell_beta_df(beta_df, top_n=50):
 # test-drive
 #%time shell_df, beta_df0 = hard_allocate_beta_df(beta_df)  # takes time in minutes coz of for loop
 
+## now define func to yield revised gamma matrix based on shell_df
+def revise_gamma_by_topic(corpus_raw, shell_df, gamma_df):
+	n1 = shell_df.shape[1]; n1 # ncol of shell_df
+	gamma_df1 = gamma_df0 # create copy
+
+	select_tokens = []
+	for i0 in range(1, n1):	
+		a0 = shell_df.iloc[:, i0].tolist(); a0[:5]
+		select_tokens.append(a0)
+
+	# building dtm of corpus_raw
+	tf_vect = CountVectorizer(lowercase=True, min_df=5, ngram_range=(1,1))
+	dtm_tf = tf_vect.fit_transform(corpus_raw); print(dtm_tf.shape) # 15s
+	dtm_tf1 = dtm_tf.todense(); print(dtm_tf1.shape) # 4s
+	dtm_toks = tf_vect.get_feature_names()
+
+	# build empty panda to populate
+	for i0 in range(len(select_tokens)):
+		index0 = pd.Series([x for x in range(dtm_tf.shape[0])])
+		dtm_tf_df = pd.DataFrame(index=index0, columns=select_tokens[i0]); dtm_tf_df.shape
+
+		# find where all a topic's tokens are in dtm_tf
+		zeroes_colm = pd.Series([0]*dtm_tf.shape[0]); zeroes_colm[:8]
+		for i1 in range(len(select_tokens[i0])):
+			a1 = np.where(np.asarray(dtm_toks) == select_tokens[i0][i1])[0].tolist(); #a1[0]
+			if len(a1) > 0:
+				dtm_tf_df.iloc[:,i1] = dtm_tf1[:,a1[0]] #colm0
+			else:        
+				dtm_tf_df.iloc[:,i1] = zeroes_colm
+
+		dtm_tf_df.iloc[:8,:8]
+		a1 = dtm_tf_df.sum(axis=1); a1[:8]
+		gamma_df1.iloc[:,i0] = gamma_df0.iloc[:,i0] * a1; gamma_df1.iloc[:8,i0]
+
+	return(gamma_df1)
+
+# test-drive
+#%time gamma_df1 = revise_gamma_by_topic(corpus_raw, shell_df, gamma_df0) # 39s
+
 ## Routine 9 - Build and display wordclouds
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
