@@ -199,7 +199,7 @@ def dtm_reshape(dtm_model, dtm_corpus, vect_model, vect_corpus):
 	index_overlapping, index_non_overlapping  = npwhere2ind(a1, feat1)
 
 	if len(index_non_overlapping) > 0:
-		new_colms = csr_matrix((dtm_corpus.shape[0], len(index_non_overlapping))); new_colms.shape
+		new_colms = scipy.sparse.csr_matrix((dtm_corpus.shape[0], len(index_non_overlapping))); new_colms.shape
 		old_colms_mat = dtm_corpus[:,index_overlapping]; old_colms_mat.shape
 		# now np.hstack(x1, x2) the 2 csr matrices x1,x2
 		new_csr_mat = hstack((old_colms_mat, new_colms))
