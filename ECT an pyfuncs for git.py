@@ -558,7 +558,7 @@ def build_aux_metrics(filename_series, doc_series):
 
 # %time df_senti = build_aux_metrics(df80k['fileName'], df80k['sents']) # 7 min
 
-# --- find rewadability indices for df_sents ---
+# --- find readability indices for df_sents ---
 import textstat
 def calc_readby(sents_series0):
 	fogIndex=[]; flesch_kincaid=[]; flesch_readby=[];
@@ -653,3 +653,62 @@ def cos_simil(vec_a, vec_b):
 #	return(simil_scores1)
 
 # %time simil_list1 = simil_corpus(model, dem_stmt1) # 9.9s	
+
+##
+# below for ECT's PR sec, I layout extra steps to further filter out irrelev sents. For ref only.
+##
+
+irrelev_terms = ['forward.{1,3}looking', '[E|e]arnings\s.*[C|c]onference\s[C|c]all', 
+                 'prior written permission', 'turn.+\scall', '\sreplay', '\swebsite\.?\s',
+                 'webcast', '\sremarks', 'Q&A', '\spresentation', 'welcome\s+everyone',
+                 '\sslide', '[C|c]onference\s[C|c]all', 'press\srelease', '\[Operator Instructions',
+                 'save\sthe\sdate', '[S|s]afe\s[H|h]arbor', '\srebroadcast', 'beyond\sthe\scompany\'s\sability'
+                 '\sparticipants\stoday']
+
+irrelev_terms1 = ['welcome\s+everyone', '\sslide', '[C|c]onference\s[C|c]all', '[S|s]afe\s[H|h]arbor'
+                  'press\srelease', '\[Operator Instructions', 'save\sthe\sdate', '\srebroadcast']
+
+# define unit func
+def catch_irrelev_sents(docsents0, terms):    
+	irrelev_sents0=[]    
+	for sent in docsents0:
+		a0 = re.search(terms, sent); 
+		if (a0 is None):
+			pass			
+		else:
+			irrelev_sents0.append(sent)
+			
+	return(irrelev_sents0)
+
+
+# define full wrapper
+def keep_relev_sents(docSeries0, irrelev_terms):
+
+	hyp_num_new = []; hyp_sents_doc = []
+	for i0 in range(len(docSeries0)):	
+		doc0 = docSeries0[i0]; doc0
+		irrelev_sents_new=[]
+		hyp_sents0 = nltk.sent_tokenize(doc0); len(hyp_sents0)
+		for terms in irrelev_terms:
+			a0 = re.search(terms, doc0); 
+			if (a0 is None):
+				#hyp_sents_new.extend(hyp_sents0)                
+				pass
+			else:
+				irrelev_sents0 = catch_irrelev_sents(hyp_sents0, terms)
+				irrelev_sents_new.extend(irrelev_sents0)
+
+		# now deduplicate sents and count new sents_num    
+		hyp_sents1 = [sent for sent in hyp_sents0 if sent not in irrelev_sents_new]                
+		hyp_sents = list(dict.fromkeys(hyp_sents1))
+		hyp_sents_doc0 = ' '.join(hyp_sents)
+		hyp_sents_doc.append(hyp_sents_doc0)
+		hyp_num_new.append(len(hyp_sents1))
+		if (i0 % 5000 ==0):
+			print(i0)
+
+	out_df = pd.DataFrame({'hyp_sents_new':hyp_sents_doc, 'hyp_num_new':hyp_num_new})	
+	return(out_df)
+
+# test-drive
+#out_df = keep_relev_sents(df00.hyp_sents_relev, irrelev_terms) # 1m 24s for whole corpus
