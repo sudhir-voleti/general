@@ -337,8 +337,8 @@ def build_svo(sents_series0, filename_series0):
 
 def build_svo_colm(df_svo0):
 	svo_colm = []
-	for i0 in range(df_svo.shape[0]):
-		a0 = df_svo.iloc[i0, 1:5]; a0
+	for i0 in range(df_svo0.shape[0]):
+		a0 = df_svo0.iloc[i0, 1:5]; a0
 		a1 = str(a0.subj[0]) + str(a0.verb[0]) + str(a0.obj[0])
 		svo_colm.append(a1)
 		if i0%5000 == 0:
