@@ -30,7 +30,7 @@ lemma = WordNetLemmatizer()
 stop_words = stopwords.words('english')
 
 ## routine 1 - textclean per doc
-def textClean(corpus_raw, stop_words0):
+def textClean(corpus_raw, stop_words0 = stopwords.words('english')):
     text1 = [strip_punctuation(doc) for doc in corpus_raw]
     text1 = [strip_tags(doc) for doc in text1]
     text1 = [strip_numeric(doc) for doc in text1]
