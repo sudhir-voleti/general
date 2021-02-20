@@ -399,6 +399,18 @@ def subset_dtm(dtm0, wordlist0):
 # test-driving above
 # %time sub_dtm_qna = subset_dtm(df_qna_test, wl_mktg) # 7.73s
 
+## save dtm as sparse mat with colm names as list
+from scipy.sparse import csr_matrix, save_npz, load_npz
+def save_dtm_sparsely(dtm0, path0, dtm_name = 'dtm_name'):
+	dtm_cols = dtm0.columns
+	a0 = csr_matrix(dtm0.values) # 8m 38s
+	save_npz(path0 + dtm_name + '.npz', a0) # 6.7s
+	pd.Series(dtm_cols.tolist()).to_csv(path0 + dtm_name + "_colms.csv") #<1s
+
+# test-drive
+# %time save_dtm_sparsely(sub_dtm_pr, path0, dtm_name = 'subdtm_pr_mktg') # 3.07s
+
+
 # Routine 11: to get DTM & beta_df for COG & Wordcl
 def get_dtm_beta(dtm_select, beta_df):
 
