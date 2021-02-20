@@ -376,6 +376,29 @@ def series2dtm(corpus_raw, max_thresh, min_thresh):
 	dtm = list2dtm(sents_str, max_thresh, min_thresh)
 	return(dtm)
 
+# subset a dtm based on a wordlist match
+def subset_dtm(dtm0, wordlist0):
+	colname_list0 = list(dtm0.columns)
+	a1 = [x for x in range(len(colname_list0)) if type(colname_list0[x]) != str] # anomaly correction
+	for i0 in a1:
+		colname_list0[i0] = str(colname_list0[i0])
+   
+	colnames = " ".join(colname_list0)
+	ind_list = []
+
+	for i0 in range(len(wordlist0)):
+		a0 = re.findall(wordlist0[i0], colnames); a0	
+		if len(a0) > 0:
+			a1 = [x for x in range(dtm0.shape[1]) if len(re.findall(wordlist0[i0], colname_list0[x]))>0]; a1
+			ind_list.extend(a1)
+
+	# build sub_dtm, find summaries, bind into df and save
+	sub_dtm = dtm0.iloc[:, ind_list]; sub_dtm.shape # <0.2 s
+	return(sub_dtm)
+
+# test-driving above
+# %time sub_dtm_qna = subset_dtm(df_qna_test, wl_mktg) # 7.73s
+
 # Routine 11: to get DTM & beta_df for COG & Wordcl
 def get_dtm_beta(dtm_select, beta_df):
 
