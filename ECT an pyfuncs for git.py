@@ -177,14 +177,18 @@ def npwhere2ind(list1, list2): # list1 is large list from whch 2 lookup, list2 s
 	for i0 in range(len(list2)):
 		a00 = list2[i0]; a00
 		a20 = np.where(a3 == a00); a20
-		a21 = re.findall('\[\d+]', str(a20)); a21
-		if len(a21) == 0:
+		a21 = np.array(a20).tolist(); a21 # [0][0]; a21
+   
+		if len(a21[0]) == 0:
 			err_inds.append(i0)
 			continue
-		a22 = int(str(a21[0]).strip('[]')); a22
-		out_ind.append(a22)
-		if i0%10000 == 0:
+		else:
+			a22 = a21[0][0]
+			out_ind.append(a22)
+
+		if i0%5000 == 0:
 			print(i0)
+
 	return([out_ind, err_inds])
 
 # %time sorted_ind1, err_ind1 = npwhere2ind(feat1, a2) # 10s
