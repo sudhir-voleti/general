@@ -242,7 +242,7 @@ def single_lda_run(corpus_raw, num_topics):
         if i0%1000 == 0:
             print(i0)  # 24 secs    
     
-    dtm_ml_pr = series2dtm(corpus_series, 0.90, 0.01)   # 15 secs    
+    dtm_ml_pr = list2dtm(corpus_series.tolist(), 0.90, 0.01)   # 15 secs    
     dtm_select1, beta_df_select, beta_df_logi1 = get_dtm_beta(dtm_ml_pr, beta_df)
 
     return(dtm_select1, beta_df_select, beta_df_logi1, gamma_df, beta_df)
