@@ -220,8 +220,8 @@ def ltm_wrapper(corpus_raw, num_topics_list, stop_words0):  # start1, limit1, st
 
 ## Routine 8b: single topic LDA run from raw corpus
 def single_lda_run(corpus_raw, num_topics):
-    
-    corpus_cleaned, corpus_tokenized, id2word, corpus_gensim = build_gensim_corpus(corpus_raw) 
+    stop_words0 = stopwords.words('english')
+    corpus_cleaned, corpus_tokenized, id2word, corpus_gensim = build_gensim_corpus(corpus_raw, stop_words0) 
     
 
     lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus_gensim, id2word=id2word, num_topics=num_topics, random_state=100,
