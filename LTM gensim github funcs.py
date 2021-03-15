@@ -251,6 +251,31 @@ def single_lda_run(corpus_raw, num_topics):
 # num_topics = 8
 # dtm_select1, beta_df_select, beta_df_logi1, gamma_df, beta_df = single_lda_run(corpus_raw, num_topics)
 
+# simpler version of above
+def single_lda_run_simple(corpus_raw, num_topics):
+    stop_words0 = stopwords.words('english')
+    corpus_cleaned, corpus_tokenized, id2word, corpus_gensim = build_gensim_corpus(corpus_raw, stop_words0) # 16m
+    
+
+    lda_model = gensim.models.ldamodel.LdaModel(corpus=corpus_gensim, id2word=id2word, num_topics=num_topics, random_state=100, update_every=1, chunksize=100, passes=10, alpha='auto', per_word_topics=True) # 48m
+    # lda_model.show_topics()
+    
+    
+    beta_df = build_beta_df(lda_model, id2word) # 0.02s
+    tokens = beta_df.columns.to_list(); type(tokens)
+    beta_df = beta_df.T
+    beta_df.insert(0, "tokens", tokens); beta_df.shape    
+    gamma_df = build_gamma_df(lda_model, corpus_raw, id2word) # 2m 50s
+    
+    corpus_series = pd.Series(corpus_tokenized)
+    for i0 in range(len(corpus_tokenized)):
+        a0 = ' '.join(corpus_tokenized[i0]); a0
+        corpus_series.iloc[i0] = a0
+        if i0%10000 == 0:
+            print(i0)  # 24 secs    
+    
+    return(gamma_df, beta_df)
+
 # util unit func to zero-fy all entries in a row except max one
 def _hard_allocate_row(row):
 	row1 = row.apply(lambda x:round(x,6)); row1
