@@ -258,6 +258,41 @@ def series2dtm(series0, min_df1=5, ngram_range1=(1,2), top_n=200):
 # test-drive abv
 # dtm_dem, dtm_dem_idf = series2dtm(df00.cleaned_sents_2.iloc[dem_only]) # 6s
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from nltk.corpus import stopwords
+stop_words = stopwords.words('english')
+stop_words.extend(['at', 'as', 'the', 'for', 'also', 'come', 'even', 'go', 'us'])
+
+## use this more general func below
+def series2dtm1(series0, stop_words, idf = False, max_thresh=0.975, min_thresh=0.025):  
+    
+    text =  series0 #.tolist()
+    if (idf == True):
+    	vectorizer = TfidfVectorizer(lowercase=True, max_df=max_thresh, min_df=min_thresh)  
+    	vector = vectorizer.fit_transform(text)  # encode document
+    else:
+    	vectorizer = CountVectorizer(lowercase=True, max_df=max_thresh, min_df=min_thresh)  
+    	vector = vectorizer.fit_transform(text)  # encode document   	
+    
+    # build DTM outp as DF
+    a0 = vector.toarray()   # dense matrix form
+    a1 = np.sum(a0, axis = 0)  # vec obj of colm sums
+    a2 = vectorizer.vocabulary_  # dict obj
+    a3 = {k: v for k, v in sorted(a2.items(), key=lambda item: item[1])}  # sort keys by value
+    a4 = [k for (k, v) in a3.items()]  # list of tokens
+    dtm = pd.DataFrame(data = a0, columns = a4)
+
+    # cleanup colms in dtm of stopwords, numbers etc	    
+    a0 = dtm.columns.tolist()
+    a1 = [x for x in range(len(a0)) if len(re.findall(r'^\d+', a0[x]))>0] # drop digits
+    dtm.drop(dtm.columns[a1], axis = 1, inplace = True)
+    a2 = dtm.columns.tolist()
+    a3 = [x for x in range(len(a2)) if a2[x] in stop_words] # ID stopwords
+    dtm.drop(dtm.columns[a3], axis = 1, inplace = True) # drop stopwords   
+    return(dtm)
+
+#%time tf_test = series2dtm1(wl_sents_df.hyp_wl_extr_sents_qna, stop_words, idf = True, max_thresh=0.975, min_thresh=0.025) # 7s
+
 ## func 5c - sent2doc for relev classifier
 def sent2doc_relev(docname_series0, sents_filename_series0, df_sents_series0, df_doc, df_sents):
 
