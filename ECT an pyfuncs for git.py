@@ -534,6 +534,63 @@ def opt_logreg_apply(dtm0, yseries0, cv1=5):
 
 # %time model0, parms_list = opt_logreg_apply(dtm_tf, df01['dem'])
 
+# func 3: get logreg coeffs
+def get_logreg_coefs(vectorizer, model0):
+	feat_names = vectorizer.get_feature_names()
+	coeffs = model0.coef_.tolist()[0]
+	df_coef = pd.DataFrame({'token':feat_names, 'coef':coeffs}); df_coef
+	df_coef1 = df_coef[df_coef['coef'] != 0]
+	df_coef2 = df_coef1.sort_values(by=['coef'])
+	return(df_coef2)
+
+# func 4a: tgt and extract misclassifieds. Intermed func
+def misclass_inds(df, y_true, y_pred, inds): 
+
+	misclassified = np.where(y_true != y_pred); misclassified
+	a0 = np.array(misclassified).tolist(); a0[0][:8]
+	a1 = [x for x in a0[0]]; len(a1)
+	a2 = [inds[x] for x in a1]; a2[:8]
+	df_misclassif = df.loc[a2, :]; df_misclassif.columns
+    
+	y_pred_miscl = [list(y_pred)[x] for x in a1]
+	df_misclassif.insert(3, "y_pred", y_pred_miscl); df_misclassif.columns	
+	# df_misclassif = df_misclassif.loc[:, ['slnum', 'filename', 'sents', 'relevant', 'y_pred', 'nchar', 'cleaned_sents_1']]
+	# df_misclassif['relevant'].describe()
+	return(df_misclassif)
+
+
+# func 4b: wrapper func to extract misclassified rows
+def extract_misclassifieds(df, dtm0, model0, prop1=0.33, column0='relevant'):
+
+	# create indices for train and test
+	ind_list = [x for x in range(df.shape[0])]
+	# prop1 = 0.33
+	n1 = int(round(prop1*len(ind_list), 0)); n1
+    
+	# somehow, couldn't fig out how 2 set seed for below proc
+	test_inds = sample(ind_list, n1); test_inds[:8]
+	train_inds = [x for x in ind_list if x not in test_inds]; train_inds[:8]
+
+	# now split sample and run logreg again. 
+	x_train = dtm0[train_inds,:]; y_train = df[column0].iloc[train_inds]
+	x_test = dtm0[test_inds,:]; y_test = df[column0].iloc[test_inds]
+
+	logreg = model0.fit(x_train, y_train)  # 0.006 s to train the model
+	print("trg accu: ", logreg.score(x_train, y_train))  # 100%  on trg set, way overfitted
+
+	y_pred_test = logreg.predict(x_test)
+	y_pred_trg = logreg.predict(x_train)
+
+	print(confusion_matrix(y_test, y_pred_test))
+	print("test accu: ", logreg.score(x_test, y_test))  # 0.78 :(
+
+	df_misclass_test = misclass_inds(df, y_test, y_pred_test, test_inds)
+	df_misclass_trg = misclass_inds(df, y_train, y_pred_trg, train_inds)
+
+	df_misclass = df_misclass_trg.append(df_misclass_test)
+	return(df_misclass)
+
+
 ## Find lexical features for each doc
 from lexical_diversity import lex_div as ld
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer 
