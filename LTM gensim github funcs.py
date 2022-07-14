@@ -23,6 +23,43 @@ from nltk.corpus import stopwords
 import string  # for the .join() func
 import matplotlib.pyplot as plt
 
+
+## --- randomly sample k1 sents from n1 docs from a raw corpus
+import random
+from random import sample
+from nltk.tokenize import sent_tokenize
+
+# --- util func to sample k1 sents from a doc
+def _sampl_sent(doc0, k1=1):
+    sents0 = sent_tokenize(doc0)
+    test_range0 = [x for x in range(len(sents0))]
+    k2 = min(k1, len(sents0))
+    sent_index0 = sample(test_range0, k2); sent_index0
+    sent_samples0 = [sents0[x] for x in sent_index0]; sent_samples0
+    return sent_samples0
+
+## -- wrapper func around unit func
+def sampl_sents_series(series0, pkey_series0, n1=20, k1=5):
+	test_range = [x for x in range(len(series0))]
+	test_samples = sample(test_range, n1)   # sampling w/o replacemt
+	a0 = series0.iloc[test_samples]   # subsetted df
+
+	df_out1 = pd.DataFrame(columns=['prim_key', 'sents'])
+
+	for ind_num in test_samples:
+		sents_samples0 = _sampl_sent(series0.iloc[ind_num], k1=k1)
+		pkey0 = pkey_series0.iloc[ind_num]; pkey0
+		df_out0 = pd.DataFrame({'prim_key':[pkey0]*len(sents_samples0), 'sents':sents_samples0})
+		df_out1 = pd.concat([df_out1, df_out0], axis=0)
+
+	return df_out1
+
+# test-drive above
+# path_mktg = 'D:/Earning Call prepRmks & QnA df/write_files/mktg wordlist based/'
+# %time out_df0 = pd.read_csv(path_mktg + 'out_df0.csv'); out_df0.columns # 11s 
+# %time df_qna_out1 = sampl_sents_series(out_df0.nonmo_sents_qna, out_df0.prim_key, n1=1000, k1=5) #2.4s
+
+
 # for dtm processing
 from sklearn.feature_extraction.text import CountVectorizer
 
