@@ -111,7 +111,7 @@ def build_gamma_df(lda_model, corpus_raw, id2word):  # lda_model is the optimal_
     num_topics = lda_model.get_topics().shape[0]
     
     for doc in range(len(corpus_raw)):
-        doc1 = str(corpus_raw[doc]).split()
+        doc1 = str(corpus_raw.iloc[doc]).split()
         bow_doc = id2word.doc2bow(doc1)
         gamma_doc0 = [0]*num_topics  # define list of zeroes num_topics long
         gamma_doc1 = lda_model.get_document_topics(bow_doc)
