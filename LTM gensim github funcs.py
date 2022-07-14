@@ -43,14 +43,19 @@ def sampl_sents_series(series0, pkey_series0, n1=20, k1=5):
 	test_range = [x for x in range(len(series0))]
 	test_samples = sample(test_range, n1)   # sampling w/o replacemt
 	a0 = series0.iloc[test_samples]   # subsetted df
+	#pkey_series1 = pkey_series0.iloc[test_samples]
 
 	df_out1 = pd.DataFrame(columns=['prim_key', 'sents'])
 
 	for ind_num in test_samples:
-		sents_samples0 = _sampl_sent(series0.iloc[ind_num], k1=k1)
-		pkey0 = pkey_series0.iloc[ind_num]; pkey0
-		df_out0 = pd.DataFrame({'prim_key':[pkey0]*len(sents_samples0), 'sents':sents_samples0})
-		df_out1 = pd.concat([df_out1, df_out0], axis=0)
+		doc0 = series0.iloc[ind_num]
+		if str(doc0)=='nan':
+			continue
+		else:
+			sents_samples0 = _sampl_sent(series0.iloc[ind_num], k1=k1)
+			pkey0 = pkey_series0.iloc[ind_num]; pkey0
+			df_out0 = pd.DataFrame({'prim_key':[pkey0]*len(sents_samples0), 'sents':sents_samples0})
+			df_out1 = pd.concat([df_out1, df_out0], axis=0)
 
 	return df_out1
 
