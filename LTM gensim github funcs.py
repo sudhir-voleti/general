@@ -187,10 +187,10 @@ def domi_topic_df(gamma_df, optimal_model):
 		for (doc_num, topic_num, prop_topic) in row1:
 			wp = optimal_model.show_topic(topic_num)
 			topic_keywords = ", ".join([word for word, prop in wp])
-			sent_topics_df = sent_topics_df.append(pd.Series([int(doc_num), int(topic_num), 
+			sent_topics_df = pd.concat([sent_topics_df, pd.Series([int(doc_num), int(topic_num), 
                                                           round(prop_topic,4), 
-                                                          topic_keywords]), 
-                                                       ignore_index=True)
+                                                          topic_keywords])], ignore_index=True) 
+                                                       
     
 	sent_topics_df.columns = ['Doc_num', 'Dominant_Topic', 'Perc_Contribution', 'Topic_Keywords']
 	return(sent_topics_df)    
@@ -221,10 +221,10 @@ def ltm_outp_df(model_list, num_topics_list, id2word, K):
 ## Routine 8 - wrapper over all above funcs
 def ltm_wrapper(corpus_raw, num_topics_list, stop_words0):  # start1, limit1, step1
     
-    corpus_cleaned, corpus_tokenized, id2word, corpus_gensim = build_gensim_corpus(corpus_raw, stop_words0) 
+    corpus_cleaned, corpus_tokenized, id2word, corpus_gensim = build_gensim_corpus(corpus_raw, stop_words0)	
     print("build_gensim_corpus done.\n")
     # num_topics_list = [x for x in range(start1, limit1, step1)]; num_topics_list
-    
+    corpus_cleaned_series = pd.Series(corpus_cleaned)
     model_list, coherence_values = compute_coherence_values1(id2word, corpus_gensim, corpus_tokenized, num_topics_list)    
        
     perplexity_values = compute_perplexity_values(model_list, corpus_gensim, num_topics_list)
@@ -254,7 +254,7 @@ def ltm_wrapper(corpus_raw, num_topics_list, stop_words0):  # start1, limit1, st
     tokens = list(beta_df.index)
     beta_df.insert(0, "tokens", tokens)  # insert tokens as a colm	
     
-    gamma_df = build_gamma_df(optimal_model, corpus_cleaned, id2word); gamma_df.shape 
+    gamma_df = build_gamma_df(optimal_model, corpus_cleaned_series, id2word); gamma_df.shape 
     sent_topics_df = domi_topic_df(gamma_df, optimal_model)  
     print("factor matrices done.\n")
     
