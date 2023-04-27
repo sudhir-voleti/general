@@ -182,17 +182,17 @@ def domi_topic_df(gamma_df, optimal_model):
 		row2 = [(i, x, y) for (x, y) in row1 if y==max_propn]
 		row.append(row2)
 
-	sent_topics_df = pd.DataFrame()
+	sent_topics_df = pd.DataFrame(columns = ['Doc_num', 'Dominant_Topic', 'Perc_Contribution', 'Topic_Keywords'])
 	for row1 in row:
 		for (doc_num, topic_num, prop_topic) in row1:
 			wp = optimal_model.show_topic(topic_num)
 			topic_keywords = ", ".join([word for word, prop in wp])
-			sent_topics_df = pd.concat([sent_topics_df, pd.Series([int(doc_num), int(topic_num), 
-                                                          round(prop_topic,4), 
-                                                          topic_keywords])], ignore_index=True) 
+			sent_topics_df0 = pd.DataFrame({'Doc_num': doc_num, 'Dominant_Topic': topic_num, 
+							'Perc_Contribution': prop_topic, 'Topic_Keywords':topic_keywords})
+			sent_topics_df = pd.concat([sent_topics_df, sent_topics_df0], ignore_index=True) 
                                                        
     
-	sent_topics_df.columns = ['Doc_num', 'Dominant_Topic', 'Perc_Contribution', 'Topic_Keywords']
+	#sent_topics_df.columns = ['Doc_num', 'Dominant_Topic', 'Perc_Contribution', 'Topic_Keywords']
 	return(sent_topics_df)    
 
 ## Routine 6 - processing raw data
