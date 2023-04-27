@@ -188,7 +188,7 @@ def domi_topic_df(gamma_df, optimal_model):
 			wp = optimal_model.show_topic(topic_num)
 			topic_keywords = ", ".join([word for word, prop in wp])
 			sent_topics_df0 = pd.DataFrame({'Doc_num': doc_num, 'Dominant_Topic': topic_num, 
-							'Perc_Contribution': prop_topic, 'Topic_Keywords':topic_keywords})
+							'Perc_Contribution': prop_topic, 'Topic_Keywords':topic_keywords}, index=[0])
 			sent_topics_df = pd.concat([sent_topics_df, sent_topics_df0], ignore_index=True) 
                                                        
     
