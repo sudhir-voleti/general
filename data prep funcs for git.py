@@ -93,7 +93,7 @@ def opt_logreg_apply(dtm0, df2):
                    param_grid = tuned_params, cv = 5, scoring = "accuracy")
 
 	# fit the model on training dataset
-	%time lr_grid.fit(train_x1, train_y1)  # 4 s
+	lr_grid.fit(train_x1, train_y1)  # 4 s
 	print(lr_grid.best_params_)
 	y_pred_valid = lr_grid.predict(valid_x1)
 	print(f'Accuracy on test dataset : {round(accuracy_score(y_pred_valid,valid_y1),2)*100} %')
