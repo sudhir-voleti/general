@@ -4,7 +4,7 @@ Created on Sat Apr 29 12:33:17 2023
 
 @author: 20052
 """
-
+import pandas as pd, numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.linear_model import LogisticRegression
@@ -13,7 +13,7 @@ from scipy.sparse import hstack, csr_matrix
 
 # for data preprocessing
 from sklearn.feature_extraction.text import CountVectorizer #, TfidfVectorizer
-import nltk, pickle, re
+import nltk, re
 from nltk import sent_tokenize, word_tokenize
 from nltk.stem import WordNetLemmatizer,SnowballStemmer
 stopword_list = nltk.corpus.stopwords.words('english')
@@ -196,7 +196,7 @@ def npwhere2ind(list1, list2):
 			print(i0)
 	return([out_ind, err_inds])
 
-# %time sorted_ind1, err_ind1 = npwhere2ind(feat1, a2) # 10s
+# sorted_ind1, err_ind1 = npwhere2ind(feat1, a2) # 10s
 
 # func to convert huge corpus_dtm to dimns of trained model's dtm_model
 from scipy.sparse import hstack, csr_matrix
