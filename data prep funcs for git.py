@@ -376,6 +376,6 @@ def extract_hypoth(prim_key_series, textCorpus_series):
 			outp_hypoth_sent_df = pd.concat([outp_hypoth_sent_df, hypoth_sent_df1])           
 
 		if (i1%1000 == 0):
-			print(i1, " of ", len(fileName), "\n")
+			print(i1, " of ", len(prim_key_series), "\n")
             
 	return outp_hypoth_sent_df
