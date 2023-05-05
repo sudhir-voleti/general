@@ -319,9 +319,12 @@ def calc_fogindex(sents_series0):
 
 ### ---------------- Hyp sents revised code: find modal auxiliary verbs for tense detection ------------
 ## Routine to COUNT hypoth sents from one Doc 
-def count_hypoth_oneDoc(doc1, prim_key0):	
+def count_hypoth_oneDoc(doc0, prim_key0):
 
-	sents_list = sent_tokenize(doc1)
+	if type(doc0)==float:
+		doc0 = str(doc0)	
+
+	sents_list = sent_tokenize(doc0)
 	tot_sents = len(sents_list)
 
 	# build empty list to populate as DF colms
@@ -345,7 +348,6 @@ def count_hypoth_oneDoc(doc1, prim_key0):
 			hypoth_sents0.append(sent0)
 		
 	## build DFs now
-	#doc_name = prim_key
 	hypoth_sents1 = " ".join(hypoth_sents0)
 	factual_sents_count =  tot_sents - hypoth_sents_counter 
 	hypoth_sents_indices = str(set(hypoth_sents_index))
@@ -356,7 +358,6 @@ def count_hypoth_oneDoc(doc1, prim_key0):
                                   'tot_sents':tot_sents,
                                   'hyp_sents': hypoth_sents1}, index=[0])
 	return hypoth_sent_df1
-
 # Routine to extract hypoth sents from corpus 
 def extract_hypoth(prim_key_series, textCorpus_series):
 
