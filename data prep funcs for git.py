@@ -317,3 +317,65 @@ def calc_fogindex(sents_series0):
 	df_readby = pd.DataFrame({'fogIndex':fogIndex})
 	return(df_readby)
 
+### ---------------- Hyp sents revised code: find modal auxiliary verbs for tense detection ------------
+## Routine to COUNT hypoth sents from one Doc 
+def count_hypoth_oneDoc(doc1, prim_key0):	
+
+	sents_list = sent_tokenize(doc1)
+	tot_sents = len(sents_list)
+
+	# build empty list to populate as DF colms
+	hypoth_sents_index = []
+	hypoth_sents_counter = 0
+	hypoth_sents0 = []
+
+	# t1 = time.time()
+	for i1 in range(len(sents_list)):
+		sent0 = sents_list[i1]
+		sent0 = re.sub("\s{2,}", "", sent0)  # collapse multiple-spaces
+		sent0_ann = nlp(sent0)
+        
+		# hypoth detection as previously
+		#morph0 = str([nlp.vocab.morphology.tag_map[token.tag_] for token in sent0_ann])
+		#morph0 = str([token.morph.to_dict() for token in sent0_ann])
+		morph1 = str([(token.tag_, token.dep_) for token in sent0_ann]); morph1
+		if bool(re.search(r"'MD', 'aux'", morph1)) == True:
+			hypoth_sents_counter = hypoth_sents_counter + 1
+			hypoth_sents_index.append(i1) 
+			hypoth_sents0.append(sent0)
+		
+	## build DFs now
+	#doc_name = prim_key
+	hypoth_sents1 = " ".join(hypoth_sents0)
+	factual_sents_count =  tot_sents - hypoth_sents_counter 
+	hypoth_sents_indices = str(set(hypoth_sents_index))
+	hypoth_sent_df1 = pd.DataFrame({'prim_key': prim_key0, 
+                                  'sent_index': hypoth_sents_indices,
+                                  'fact_sents_num': factual_sents_count, 
+                                  'hypoth_sents_num': hypoth_sents_counter, 
+                                  'tot_sents':tot_sents,
+                                  'hyp_sents': hypoth_sents1}, index=[0])
+	return hypoth_sent_df1
+
+# Routine to extract hypoth sents from corpus 
+def extract_hypoth(prim_key_series, textCorpus_series):
+
+	# create empty DFs to populate outp with
+	outp_hypoth_sent_df = pd.DataFrame(columns = ['prim_key', 'sent_index', 'fact_sents_num', 
+                                               'hypoth_sents_num', 'tot_sents', 'hyp_sents'])	
+
+	# loop over files
+	for i1 in range(len(prim_key_series)):
+		prim_key0 = prim_key_series.iloc[i1]
+		doc0 = textCorpus_series.iloc[i1]
+		try:  
+			hypoth_sent_df1 = count_hypoth_oneDoc(doc0, prim_key0)         
+		except KeyError:
+			pass
+		else:
+			outp_hypoth_sent_df = pd.concat([outp_hypoth_sent_df, hypoth_sent_df1])           
+
+		if (i1%1000 == 0):
+			print(i1, " of ", len(fileName), "\n")
+            
+	return outp_hypoth_sent_df
