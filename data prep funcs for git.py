@@ -65,7 +65,6 @@ def extr_wordlist_sents(doc0, wordlist0, wl_sents_num, extr_sents):
 
     return(wl_sents_num, extr_sents)
 
-
 ## extract matched keyword toks and give count also
 def extr_wordlist_tokens(doc0, wordlist0, num_wl_toks, extr_toks):
 	num_wl_toks0 = 0
@@ -82,6 +81,21 @@ def extr_wordlist_tokens(doc0, wordlist0, num_wl_toks, extr_toks):
 	extr_toks.append(extr_toks0)
 	return(num_wl_toks, extr_toks)
 
+# count only. optimized for constr_propn_sec finding
+def count_wordlist_tokens(doc0, wordlist0, prim_key0):
+	num_wl_toks0 = 0
+	words_list0 = word_tokenize(doc0)
+	tot_wl_toks0 = len(words_list0)
+	for word0 in wordlist0:
+		a0 = re.findall(word0, doc0); a0
+		num_wl_toks0 = num_wl_toks0 + len(a0)
+
+	out_toks_df0 = pd.DataFrame({'prim_key':[prim_key0], 'num_wl_toks':num_wl_toks0, 
+                                'tot_wl_toks':tot_wl_toks0})
+    
+	return(out_toks_df0)
+
+## classifier logfreg funcs
 def opt_logreg_apply(dtm0, df2):
 
 	train_x1, valid_x1, train_y1, valid_y1 = model_selection.train_test_split(dtm0, df2['relevant'], random_state=0)
@@ -293,7 +307,7 @@ def build_aux_metrics(filename_series, doc_series):
 		mtld.append(mtld0)
 		# vocd.append(vocd0)
 
-		if i0%100 == 0:
+		if i0%1000 == 0:
 			print(i0)
 
 	# save as df
@@ -311,7 +325,7 @@ def calc_fogindex(sents_series0):
 		#flesch_readby.append(textstat.flesch_reading_ease(sent0))
 		#flesch_kincaid.append(textstat.flesch_kincaid_grade(sent0))
 		fogIndex.append(textstat.gunning_fog(sent0))
-		if i0%100==0:
+		if i0%1000==0:
 			print(i0)
 
 	df_readby = pd.DataFrame({'fogIndex':fogIndex})
@@ -380,3 +394,4 @@ def extract_hypoth(prim_key_series, textCorpus_series):
 			print(i1, " of ", len(prim_key_series), "\n")
             
 	return outp_hypoth_sent_df
+
