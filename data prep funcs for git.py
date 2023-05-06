@@ -322,6 +322,8 @@ def calc_fogindex(sents_series0):
 	fogIndex=[]; # flesch_kincaid=[]; flesch_readby=[];
 	for i0 in range(len(sents_series0)):
 		sent0 = sents_series0[i0]
+		if type(sent0) == float:
+			sent0 = str(sent0)
 		#flesch_readby.append(textstat.flesch_reading_ease(sent0))
 		#flesch_kincaid.append(textstat.flesch_kincaid_grade(sent0))
 		fogIndex.append(textstat.gunning_fog(sent0))
