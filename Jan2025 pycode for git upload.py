@@ -80,7 +80,7 @@ def classify_svo_tuples_with_variable_chunk_size(svo_tuples, prompt1, k=10, mode
 
 ## ========================================================================================
 
-def classify_1_doc1(df0, chunk_size=20, prompt1):
+def classify_1_doc1(df0, prompt1, chunk_size=20):
     """
     Classifies SVO phrases in a DataFrame chunk-by-chunk, padding classifications if necessary.
 
@@ -94,8 +94,8 @@ def classify_1_doc1(df0, chunk_size=20, prompt1):
     for i2 in range(df0.chunk_id.max() + 1): # +1 so that max is included in range
         df01 = df0[df0['chunk_id'] == i2]
         svo_series = df01.svo_frag
-        #classifications = classify_svo_series_line_by_line(svo_series, k=chunk_size, prompt1)
-        classifications = classify_svo_tuples_with_variable_chunk_size(svo_tuples_to_classify, k=chunk_size, prompt1)
+        #classifications = classify_svo_series_line_by_line(svo_series, prompt1, k=chunk_size)
+        classifications = classify_svo_tuples_with_variable_chunk_size(svo_tuples_to_classify, prompt1, k=chunk_size)
 
         if classifications is not None:
           if len(classifications) > len(svo_series):
