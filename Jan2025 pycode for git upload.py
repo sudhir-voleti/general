@@ -10,7 +10,7 @@ import pandas as pd
 
 ## ========================================================================================
 
-def classify_svo_tuples_line_by_line(svo_tuples, k=10, model1 = "gemma2:2b", prompt1):
+def classify_svo_tuples_line_by_line(svo_tuples, prompt1, k=10, model1 = "gemma2:2b"):
     """
     Classifies SVO tuples using Ollama and Gemma-2b, handling lists of up to k tuples.
 
@@ -54,7 +54,7 @@ def classify_svo_tuples_line_by_line(svo_tuples, k=10, model1 = "gemma2:2b", pro
         return None
 
 ## ========================================================================================
-def classify_svo_tuples_with_variable_chunk_size(svo_tuples, k=10, model1 = "gemma2:2b", prompt1):
+def classify_svo_tuples_with_variable_chunk_size(svo_tuples, prompt1, k=10, model1 = "gemma2:2b"):
     """
     Classifies SVO tuples with a variable chunk size using ollama and gemma2:9b
 
