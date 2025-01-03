@@ -76,7 +76,7 @@ def classify_svo_tuples_with_variable_chunk_size(svo_tuples, prompt1, k=10, mode
 
     return all_classifications
 
-def classify_1_doc1(df0, prompt1, chunk_size=20):
+def classify_1_doc1(df0, prompt1, chunk_size=20, model2 = "gemma2:2b"):
     """
     Classifies SVO phrases in a DataFrame chunk-by-chunk, padding classifications if necessary.
 
@@ -91,7 +91,7 @@ def classify_1_doc1(df0, prompt1, chunk_size=20):
         df01 = df0[df0['chunk_id'] == i2]
         svo_series = df01.svo_frag
         #classifications = classify_svo_series_line_by_line(svo_series, prompt1, k=chunk_size)
-        classifications = classify_svo_tuples_with_variable_chunk_size(svo_tuples_to_classify, prompt1, k=chunk_size)
+        classifications = classify_svo_tuples_with_variable_chunk_size(svo_tuples_to_classify, prompt1, k=chunk_size, model1 = model2)
 
         if classifications is not None:
           if len(classifications) > len(svo_series):
