@@ -105,6 +105,30 @@ def classify_1_doc1(df0, prompt1, chunk_size=20, model2 = "gemma2:2b"):
           continue
     return out_df01
 
+
+# unit func
+def chunkize_doc(k, prim_key0, df, column0 = 'svo_frag'):
+    sub_df0 = df[df['prim_key'] == prim_key0]
+    kseq_start = [] 
+    for num in range(0, len(sub_df0), k):
+        kseq_start.append(num)
+        
+    if (kseq_start[-1] < len(sub_df0)):
+        kseq_start.append(len(sub_df0))
+        
+    df0 = pd.DataFrame(columns = ['prim_key', 'chunk_id', 'chunk'])
+    
+    for i0 in range(len(kseq_start)-1):
+        start0 = kseq_start[i0]
+        stop0 = kseq_start[i0+1]
+        chunk0 = sub_df0[column0].iloc[start0:stop0]
+        n1 = len(chunk0)
+        df0_int = pd.DataFrame({'prim_key': [prim_key0]*n1, 'chunk_id': [i0]*n1,'chunk':chunk0})
+        df0 = pd.concat([df0, df0_int])
+        
+    sub_df0['chunk_id'] = df0['chunk_id']
+    return(sub_df0)
+
 ## ========================================================================================
 
 prompt1 = """
