@@ -129,26 +129,35 @@ def chunkize_doc(k, prim_key0, df, column0 = 'svo_frag'):
     sub_df0['chunk_id'] = df0['chunk_id']
     return(sub_df0)
 
-def classify_1_chunk(df0, chunk_size=25):
-	for i2 in range(df0.chunk_id.max() + 1): # +1 so that max is included in range
-		df01 = df0[df0['chunk_id'] == i2]
-		svo_series = df01.svo_frag
-		#classifications = classify_svo_series_line_by_line(svo_series, k=chunk_size)
-		classifications = classify_svo_tuples_with_variable_chunk_size(svo_tuples_to_classify, k=chunk_size)
 
-		if classifications is not None:
-			if len(classifications) > len(svo_series):
-				classifications = classifications[:len(svo_series)]
 
-			# Pad the classifications list if it's shorter than the SVO series
-			while len(classifications) < len(svo_series):
-				classifications.append('C')
+def classify_1_chunk(df0, prompt1, chunk_size=25, model2="gemma2:2b"):
+    out_df01 = pd.DataFrame(columns=df0.columns)
+    if df0.empty:
+       print("Error! Empty DataFrame provided")
+       return None
+    out_df01['class'] = None # creates the column to assign
+    for i2 in range(df0.chunk_id.max() + 1): # +1 so that max is included in range
+        df01 = df0[df0['chunk_id'] == i2]
+        if df01.empty: # check if any of the sub dataframes are empty
+            print(f"No data found for chunk_id {i2}, moving on")
+            continue
 
-		df01.loc[:,'class'] = pd.Series(classifications, index=df01.index)
-		out_df01 = pd.concat([out_df01, df01])
-		else:
-			continue
-	return out_df01
+        svo_tuples = df01.svo_frag.tolist()
+        classifications = classify_svo_tuples_with_variable_chunk_size(svo_tuples, prompt1, k=chunk_size, model1 = model2)
+
+        if classifications is not None:
+          if len(classifications) > len(svo_tuples):
+            classifications = classifications[:len(svo_tuples)]
+          while len(classifications) < len(svo_tuples):
+            classifications.append('C')
+
+          df01.loc[:,'class'] = pd.Series(classifications, index=df01.index) # series needs an index
+          out_df01 = pd.concat([out_df01, df01])
+        else:
+          print(f"Warning! Not able to get classifications for chunk {i2}, moving on.")
+          continue
+    return out_df01
 
 
 def chunk_n_classify_corpus(df_corpus, chunk_size=25):
