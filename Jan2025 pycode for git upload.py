@@ -143,12 +143,32 @@ def classify_1_chunk(df0, chunk_size=25):
 		# Pad the classifications list if it's shorter than the SVO series
 		while len(classifications) < len(svo_series):
 			classifications.append('C')
-			df01.loc[:,'class'] = pd.Series(classifications, index=df01.index)
-			out_df01 = pd.concat([out_df01, df01])
+		df01.loc[:,'class'] = pd.Series(classifications, index=df01.index)
+		out_df01 = pd.concat([out_df01, df01])
 	else:
 		continue
 	return out_df01
 
+def chunk_n_classify_corpus(df_corpus, chunk_size=25):
+    
+    df0 = pd.DataFrame(columns=df_corpus.columns)
+    df0 = df0.assign(chunk_id=0)
+
+    kseq_start = []
+    for num in range(0, len(df_corpus), chunk_size):
+        kseq_start.append(num)
+
+    if (kseq_start[-1] < len(df_corpus)):
+         kseq_start.append(len(df_corpus))
+
+    for i0 in range(len(kseq_start)-1):
+        start0 = kseq_start[i0]
+        stop0 = kseq_start[i0+1]
+        df0_int = df.iloc[start0:stop0]
+        df0_int['chunk_id'] = i0
+        df0 = pd.concat([df0, df0_int])
+        
+    return(df0)
 ## ========================================================================================
 
 prompt1 = """
