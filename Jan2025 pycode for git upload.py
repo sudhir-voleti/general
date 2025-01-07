@@ -130,23 +130,24 @@ def chunkize_doc(k, prim_key0, df, column0 = 'svo_frag'):
     return(sub_df0)
 
 def classify_1_chunk(df0, chunk_size=25):
-        for i2 in range(df0.chunk_id.max() + 1): # +1 so that max is included in range
-        df01 = df0[df0['chunk_id'] == i2]
-        svo_series = df01.svo_frag
-        #classifications = classify_svo_series_line_by_line(svo_series, k=chunk_size)
-        classifications = classify_svo_tuples_with_variable_chunk_size(svo_tuples_to_classify, k=chunk_size)
+	for i2 in range(df0.chunk_id.max() + 1): # +1 so that max is included in range
+	df01 = df0[df0['chunk_id'] == i2]
+	svo_series = df01.svo_frag
+	#classifications = classify_svo_series_line_by_line(svo_series, k=chunk_size)
+	classifications = classify_svo_tuples_with_variable_chunk_size(svo_tuples_to_classify, k=chunk_size)
 
-        if classifications is not None:
-          if len(classifications) > len(svo_series):
-             classifications = classifications[:len(svo_series)]
-          # Pad the classifications list if it's shorter than the SVO series
-          while len(classifications) < len(svo_series):
-             classifications.append('C')
-          df01.loc[:,'class'] = pd.Series(classifications, index=df01.index)
-          out_df01 = pd.concat([out_df01, df01])
-        else:
-          continue
-    return out_df01
+	if classifications is not None:
+		if len(classifications) > len(svo_series):
+			classifications = classifications[:len(svo_series)]
+
+		# Pad the classifications list if it's shorter than the SVO series
+		while len(classifications) < len(svo_series):
+			classifications.append('C')
+			df01.loc[:,'class'] = pd.Series(classifications, index=df01.index)
+			out_df01 = pd.concat([out_df01, df01])
+	else:
+		continue
+	return out_df01
 
 ## ========================================================================================
 
