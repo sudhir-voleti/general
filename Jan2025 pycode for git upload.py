@@ -136,18 +136,20 @@ def classify_1_chunk(df0, chunk_size=25):
 		#classifications = classify_svo_series_line_by_line(svo_series, k=chunk_size)
 		classifications = classify_svo_tuples_with_variable_chunk_size(svo_tuples_to_classify, k=chunk_size)
 
-	if classifications is not None:
-		if len(classifications) > len(svo_series):
-			classifications = classifications[:len(svo_series)]
+		if classifications is not None:
+			if len(classifications) > len(svo_series):
+				classifications = classifications[:len(svo_series)]
 
-		# Pad the classifications list if it's shorter than the SVO series
-		while len(classifications) < len(svo_series):
-			classifications.append('C')
+			# Pad the classifications list if it's shorter than the SVO series
+			while len(classifications) < len(svo_series):
+				classifications.append('C')
+
 		df01.loc[:,'class'] = pd.Series(classifications, index=df01.index)
 		out_df01 = pd.concat([out_df01, df01])
-	else:
-		continue
+		else:
+			continue
 	return out_df01
+
 
 def chunk_n_classify_corpus(df_corpus, chunk_size=25):
     
