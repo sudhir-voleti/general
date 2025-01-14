@@ -349,3 +349,100 @@ def build_svo_colm(df_svo0):
 
 # %time df_svo_series = build_svo_colm(df_svo)
 
+## unit func: to make SVO sent-fragments
+def _build_svo1(doc0, prim_key0):
+	test_sent_list0 = nltk.sent_tokenize(doc0)
+	fragments = []; sent_inds = []; sent_orig = []
+    
+	for i0 in range(len(test_sent_list0)):
+		sent0 = test_sent_list0[i0]
+		spacy_tok0 = nlp(sent0)
+		test_svos0 = findSVOs(spacy_tok0) #test_svos1 # 0s!
+		fragments0 = [' '.join(tup) for tup in test_svos0]
+		sent_inds0 = [i0]*len(fragments0)
+		sent_orig0 = [sent0]*len(fragments0)
+		fragments.extend(fragments0)
+		sent_inds.extend(sent_inds0)
+		sent_orig.extend(sent_orig0)
+        
+	prim_key0_list = [prim_key0]*len(fragments)
+	df_svos1 = pd.DataFrame({'prim_key': prim_key0_list, 'sent_ind':sent_inds,
+                          'sent_orig': sent_orig,'svo_frag':fragments})
+	return(df_svos1)
+
+# test-drive func
+#%time df_svos1 = _build_svo1(doc0, prim_key0) # 1.9s
+
+"## --- unit func - alt ---"
+def _build_svo_tuples(doc0, prim_key0):
+  test_sent_list0 = nltk.sent_tokenize(doc0)
+  svo_tuples = []; sent_inds = []; sent_orig = []
+    
+  for i0 in range(len(test_sent_list0)):
+    sent0 = test_sent_list0[i0]; sent0
+    spacy_tok0 = nlp(sent0)
+    test_svos0 = findSVOs(spacy_tok0); test_svos0 # 0s!
+    sent_inds0 = [i0]*len(test_svos0)
+    sent_orig0 = [sent0]*len(test_svos0)
+    svo_tuples.extend(test_svos0)
+    sent_inds.extend(sent_inds0)
+    sent_orig.extend(sent_orig0)
+        
+  prim_key0_list = [prim_key0]*len(svo_tuples)
+  df_svos1 = pd.DataFrame({'prim_key': prim_key0_list, 'sent_ind':sent_inds,
+                          'sent_orig': sent_orig,'svo_frag':svo_tuples})
+  return(df_svos1)
+
+## wrapper func
+def build_svo1(sents_series0, filename_series0):    
+	df_svos = pd.DataFrame(columns=['prim_key', 'sent_ind', 'sent_orig', 'svo_frag'])    
+
+	for i0 in range(len(sents_series0)):
+		doc0 = str(sents_series0.iloc[i0]); doc0
+		prim_key0 = filename_series0.iloc[i0]
+		if (doc0 == 'nan'):
+			df_svos1 = pd.DataFrame({'prim_key':[prim_key0], 'sent_ind':[0], 'sent_orig':['nan'], 'svo_frag':['empty']})
+		else:
+			df_svos1 = _build_svo_tuples(doc0, prim_key0)
+
+		df_svos = pd.concat([df_svos, df_svos1])
+		if i0%2000 == 0:
+			print(i0)
+            	
+	return(df_svos)
+
+# test-drive abv
+#%time df_svo_qna_run1 = build_svo1(out_df_relev3_qna.relev_txt_qna.iloc[:24000], out_df_relev3_qna.prim_key.iloc[:24000]); df_svo_qna_run1 # 1.07s per doc!
+#df_svo_qna_run1.to_csv(path0_mac + "df_svo_qna_run1.csv")
+
+## --- sample some 50k sents from QnA ---
+import random
+def sample_svo_frags(df, num_rows=1000, num_sents=50, text_column='svo_frag'):
+    
+    unique_pkey_list = df['prim_key'].unique().tolist()    
+    n1 = len(unique_pkey_list); n1
+    sampled_pkey_indices = random.sample(range(n1), min(num_rows, n1))
+    sampled_rows = df.iloc[sampled_pkey_indices].copy() # Create copy to avoid SettingWithCopyWarning
+    
+    df_out = pd.DataFrame(columns=df.columns)
+    for i0 in range(len(sampled_rows)):
+        
+        prim_key0 = sampled_rows.prim_key.iloc[i0]; prim_key0
+        subdf0 = sampled_rows[sampled_rows['prim_key'] == prim_key0]; subdf0
+        sampled_frag_inds0 = random.sample(range(len(subdf0)), min(num_sents, len(subdf0)))
+        try:
+            df_frags0 = subdf0.loc[sampled_frag_inds0]
+        except KeyError:
+            continue
+            
+        #df_frags0 = subdf0.loc[sampled_frag_inds0]                
+        df_out = pd.concat([df_out, df_frags0])
+        if i0%5000 == 0:
+            print(i0)
+    
+    return df_out
+
+# test-drive
+#%time df_out_qna1 = sample_svo_frags(df_svo_qna, num_rows=1000, num_sents=100, text_column='svo_frag') # 4s
+#df_out_qna1.to_csv(path0_mac + "df_out_qna1.csv")
+
