@@ -52,6 +52,51 @@ def classify_svo_tuples_line_by_line(svo_tuples, prompt1, k=10, model1 = "gemma2
         return None
 
 
+def classify_svo_tuples_line_by_line_sysp(svo_tuples, k=25, model1 = "gemma2loc"):
+    """
+    Classifies SVO tuples using Ollama and Gemma-2b, handling lists of up to k tuples.
+
+    Args:
+        svo_tuples (list of tuples): A list of SVO tuples.
+        k (int, optional): The chunk size (max no. of SVO tuples) to process at once. Defaults to 10.
+
+    Returns:
+        list: A list of classifications (A, B, or C) of length equal to the number of input
+              tuples, or None if there was an issue with the LLM.
+    """
+
+    prompt = prompt1 # f'''{{\n\"{prompt1}\"\n}}'''
+
+    for i, svo_tuple in enumerate(svo_tuples):
+        prompt += f"{{SVO_TUPLE_{i+1}}}:\n" # changed the way tuples are passed
+    prompt += "[END SVO TUPLES]"
+
+    for i, svo_tuple in enumerate(svo_tuples):
+         prompt = prompt.replace(f"{{SVO_TUPLE_{i+1}}}", str(svo_tuple))
+
+    # 'gemma2:9b' 'qwen2.5:3b' 'gemma2:2b'	
+    response = ollama.chat(model= model1, messages=[    
+        {
+            'role': 'user',
+            'content': prompt,
+        },
+    ], stream=False)
+
+    if response and 'message' in response and 'content' in response['message']:
+        classification_lines = response['message']['content'].strip().split('\n')
+
+        # Use a regular expression to extract only 'A', 'B', or 'C' from each line
+        clean_classifications = [re.match(r"^[ABC]$", line.strip()).group(0) if re.match(r"^[ABC]$", line.strip()) else 'C' for line in classification_lines]
+
+        # Pad with "C" if the output is less than input, to match the number of inputs
+        while len(clean_classifications) < len(svo_tuples):
+          clean_classifications.append('C')
+        return clean_classifications[:len(svo_tuples)] # ensure output length matches input length
+    else:
+        return None
+
+# ++++++++++++++++
+
 def classify_svo_tuples_with_variable_chunk_size(svo_tuples, prompt1, k=10, model1 = "gemma2:2b"):
     """
     Classifies SVO tuples with a variable chunk size using ollama and gemma2:9b
@@ -128,8 +173,6 @@ def chunkize_doc(k, prim_key0, df, column0 = 'svo_frag'):
         
     sub_df0['chunk_id'] = df0['chunk_id']
     return(sub_df0)
-
-
 
 def classify_1_chunk(df0, prompt1, chunk_size=25, model2="gemma2:2b"):
     out_df01 = pd.DataFrame(columns=df0.columns)
