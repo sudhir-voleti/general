@@ -1,0 +1,81 @@
+/* Prompt Guide Style - Purple Theme */
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    color: #333;
+}
+
+h1 {
+    color: #4A148C; /* Deep Purple */
+    text-align: center;
+    border-bottom: 2px solid #4A148C;
+    padding-bottom: 10px;
+}
+
+h2, h3 {
+    color: #4A148C;
+    margin-top: 30px;
+    border-bottom: 1px solid #eeeeee;
+    padding-bottom: 5px;
+}
+
+.prompt-box {
+    background-color: #f3e5f5; /* Light Purple tint */
+    border-left: 5px solid #4A148C;
+    padding: 20px;
+    margin: 25px 0;
+    border-radius: 0 8px 8px 0;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.95em;
+    color: #2e004f;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+pre {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 15px;
+    overflow-x: auto;
+    border-radius: 5px;
+}
+
+code {
+    font-family: 'Consolas', 'Monaco', monospace;
+    background-color: #eee;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.notes-area {
+    margin: 20px 0;
+}
+
+textarea {
+    width: 100%;
+    min-height: 120px;
+    border: 1px solid #dcd0e8;
+    border-radius: 6px;
+    padding: 12px;
+}
+
+footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+    font-size: 0.9em;
+    color: #555;
+}
+
+a {
+    color: #6A1B9A;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
