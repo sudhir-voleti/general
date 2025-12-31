@@ -1,0 +1,77 @@
+/* Caselet Style Guide - Blue & Orange Theme */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 20px;
+    background-color: #fcfcfc;
+}
+
+h1, h2, h3 {
+    color: #003366; /* ISB Blue */
+    border-bottom: 2px solid #E37222; /* ISB Orange */
+    padding-bottom: 5px;
+    margin-top: 1.5em;
+}
+
+.case-container, .section {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.memo {
+    background-color: #fff;
+    border-left: 4px solid #E37222;
+    padding: 15px;
+    margin: 20px 0;
+    font-style: italic;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: white;
+}
+
+th {
+    background-color: #003366;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.footer {
+    margin-top: 40px;
+    font-size: 0.8em;
+    color: #777;
+    text-align: center;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
